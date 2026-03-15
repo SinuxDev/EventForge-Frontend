@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EventForge — Frontend
 
-## Getting Started
+Next.js frontend for EventForge, a modern knowledge-sharing event platform. Attendees discover and RSVP to events; organizers create and manage them; admins oversee the platform.
 
-First, run the development server:
+## Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+| Technology          | Version             | Purpose                               |
+| ------------------- | ------------------- | ------------------------------------- |
+| **Next.js**         | 16.1.6 (App Router) | SSR, routing, React Server Components |
+| **TypeScript**      | 5.x                 | End-to-end type safety                |
+| **shadcn/ui**       | Latest              | Accessible UI component library       |
+| **Tailwind CSS**    | 4.x                 | Utility-first responsive styling      |
+| **TanStack Query**  | v5                  | Server state, caching, auto-refetch   |
+| **Zustand**         | v5                  | Global UI state (theme, modals, auth) |
+| **React Hook Form** | v7                  | Performant form handling              |
+| **Zod**             | v4                  | Runtime schema validation             |
+| **Chart.js**        | v4                  | Analytics charts for dashboards       |
+| **Next-Auth**       | v4 (stable)         | Credentials-based authentication      |
+| **Lucide React**    | Latest              | Icon library                          |
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── (auth)/          # Login, register, password reset pages
+│   ├── (attendee)/      # Event discovery and RSVP pages
+│   ├── (organizer)/     # Event creation and organizer dashboard
+│   └── (admin)/         # Admin panel pages
+├── components/
+│   ├── ui/              # shadcn/ui base components
+│   ├── events/          # Event cards, forms, detail views
+│   ├── dashboard/       # Organizer dashboard widgets and charts
+│   ├── admin/           # Admin panel tables and management views
+│   └── shared/          # Layout, nav, loading states, error boundaries
+├── hooks/               # TanStack Query hooks for API data fetching
+├── stores/              # Zustand stores
+├── lib/                 # API client, utility functions, Zod schemas
+└── types/               # Shared TypeScript interfaces
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick Start
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 20+
+- EventForge backend running on `http://localhost:5000`
 
-## Learn More
+### Setup
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Install dependencies
+npm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Configure environment
+cp .env.example .env.local
+# Set NEXTAUTH_URL, NEXTAUTH_SECRET, NEXT_PUBLIC_API_URL
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Start development server
+npm run dev
+```
 
-## Deploy on Vercel
+The app runs on `http://localhost:3000`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Available Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Script                 | Description                        |
+| ---------------------- | ---------------------------------- |
+| `npm run dev`          | Development server with hot reload |
+| `npm run build`        | Production build                   |
+| `npm start`            | Start production build             |
+| `npm run lint`         | Run ESLint                         |
+| `npm run lint:fix`     | Auto-fix ESLint issues             |
+| `npm run format`       | Format source with Prettier        |
+| `npm run format:check` | Check formatting without writing   |
+
+## Git Hooks
+
+Husky enforces quality gates automatically:
+
+- **pre-commit**: ESLint + Prettier on staged files via lint-staged
+- **commit-msg**: Validates Conventional Commits format
+- **pre-push**: Full ESLint check + Next.js production build
+
+All commits must follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```bash
+feat(events): add event discovery page
+fix(rsvp): resolve capacity validation edge case
+chore: update dependencies
+```
+
+## Backend
+
+See the [backend repository](https://github.com/SinuxDev/EventForge) for the API source and setup instructions.

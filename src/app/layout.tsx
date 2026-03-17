@@ -1,22 +1,11 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Providers } from "@/components/shared/providers";
-import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import type { Metadata } from 'next';
+import { Providers } from '@/components/shared/providers';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "EventForge — Modern Knowledge Sharing Platform",
+  title: 'EventForge — All-in-one event platform',
   description:
-    "Discover, create, and manage knowledge-sharing events. Workshops, tech talks, career sessions and more.",
+    'EventForge is the all-in-one event platform for planning, promotion, and RSVP management.',
 };
 
 export default function RootLayout({
@@ -26,9 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-background font-sans`}
-      >
+      <body className="antialiased min-h-screen bg-background font-sans">
         <Providers>{children}</Providers>
       </body>
     </html>

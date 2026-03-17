@@ -1,3 +1,9 @@
+'use client';
+
+import { signOut, useSession } from 'next-auth/react';
+import { useEffect, useMemo, useState } from 'react';
+import { AuthModal } from '@/components/shared/auth-modal';
+
 const quickStats = [
   { label: 'Events live this week', value: '1,204' },
   { label: 'Average RSVP conversion', value: '87%' },
@@ -53,6 +59,41 @@ function HeroVisual() {
 }
 
 export default function Home() {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [now, setNow] = useState(() => new Date());
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === 'authenticated' && Boolean(session?.user?.email);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setNow(new Date());
+    }, 60_000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, []);
+
+  const timezoneLabel = useMemo(() => {
+    const timeLabel = new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(now);
+
+    const totalOffsetMinutes = -now.getTimezoneOffset();
+    const sign = totalOffsetMinutes >= 0 ? '+' : '-';
+    const absoluteMinutes = Math.abs(totalOffsetMinutes);
+    const offsetHours = String(Math.floor(absoluteMinutes / 60)).padStart(2, '0');
+    const offsetMinutes = String(absoluteMinutes % 60).padStart(2, '0');
+
+    return `${timeLabel} GMT${sign}${offsetHours}:${offsetMinutes}`;
+  }, [now]);
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/' });
+  };
+
   return (
     <div className="min-h-screen bg-[#0b0d13] text-white">
       <div className="pointer-events-none absolute inset-0 -z-10">
@@ -71,13 +112,25 @@ export default function Home() {
           </a>
 
           <div className="flex items-center gap-3 text-xs text-white/65 sm:gap-6 sm:text-sm">
-            <span className="hidden sm:inline">23:17 GMT+6:30</span>
+            <span className="hidden sm:inline">{timezoneLabel}</span>
             <a href="#" className="transition hover:text-white">
               Explore Events ↗
             </a>
-            <button className="rounded-full border border-white/15 bg-white/10 px-4 py-2 font-medium text-white transition hover:bg-white/15">
-              Sign In
-            </button>
+            {isAuthenticated ? (
+              <button
+                onClick={handleSignOut}
+                className="relative cursor-pointer overflow-hidden rounded-full border border-white/15 bg-white/10 px-4 py-2 font-medium text-white shadow-[0_4px_18px_rgba(0,0,0,0.28)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-8 before:rotate-12 before:bg-white/30 before:opacity-0 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/18 hover:shadow-[0_10px_28px_rgba(255,255,255,0.16)] hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 active:translate-y-0 active:scale-[0.99]"
+              >
+                Sign Out
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="relative cursor-pointer overflow-hidden rounded-full border border-white/15 bg-white/10 px-4 py-2 font-medium text-white shadow-[0_4px_18px_rgba(0,0,0,0.28)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-8 before:rotate-12 before:bg-white/30 before:opacity-0 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/18 hover:shadow-[0_10px_28px_rgba(255,255,255,0.16)] hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 active:translate-y-0 active:scale-[0.99]"
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </nav>
       </header>
@@ -104,7 +157,7 @@ export default function Home() {
             </p>
 
             <div>
-              <button className="rounded-xl bg-white px-7 py-3 text-base font-semibold text-[#10121a] shadow-[0_10px_28px_rgba(0,0,0,0.35)] transition hover:-translate-y-0.5 hover:bg-[#f3f3f3]">
+              <button className="relative cursor-pointer overflow-hidden rounded-xl bg-white px-7 py-3 text-base font-semibold text-[#10121a] shadow-[0_10px_28px_rgba(0,0,0,0.35)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-10 before:rotate-12 before:bg-white/80 before:opacity-0 hover:-translate-y-0.5 hover:bg-[#f7f7f7] hover:shadow-[0_14px_36px_rgba(255,105,180,0.34)] hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF69B4]/60 active:translate-y-0 active:scale-[0.99]">
                 Get Started Free
               </button>
             </div>
@@ -124,6 +177,8 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }

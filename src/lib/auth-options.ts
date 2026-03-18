@@ -33,6 +33,14 @@ interface AuthUser {
   refreshToken: string;
 }
 
+interface SessionUpdatePayload {
+  user?: {
+    role?: 'attendee' | 'organizer' | 'admin';
+  };
+  accessToken?: string;
+  refreshToken?: string;
+}
+
 const API_BASE_URL =
   process.env.NEXTAUTH_BACKEND_URL ??
   process.env.NEXT_PUBLIC_API_URL ??
@@ -149,7 +157,7 @@ export const authOptions: NextAuthOptions = {
       }
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         const authUser = user as unknown as AuthUser;
         token.sub = authUser.id;
@@ -157,6 +165,22 @@ export const authOptions: NextAuthOptions = {
         token.accessToken = authUser.accessToken;
         token.refreshToken = authUser.refreshToken;
         token.picture = authUser.image;
+      }
+
+      if (trigger === 'update') {
+        const payload = session as SessionUpdatePayload;
+
+        if (payload.user?.role) {
+          token.role = payload.user.role;
+        }
+
+        if (payload.accessToken) {
+          token.accessToken = payload.accessToken;
+        }
+
+        if (payload.refreshToken) {
+          token.refreshToken = payload.refreshToken;
+        }
       }
 
       return token;

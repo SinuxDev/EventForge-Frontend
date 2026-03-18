@@ -1,8 +1,11 @@
 'use client';
 
 import { signOut, useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AuthModal } from '@/components/shared/auth-modal';
+import { toast } from '@/hooks/use-toast';
+import { getPostLoginRoute } from '@/lib/auth-redirect';
 
 const quickStats = [
   { label: 'Events live this week', value: '1,204' },
@@ -63,7 +66,7 @@ function HeroVisual() {
     <div className="relative mx-auto w-full max-w-130">
       <div className="absolute inset-0 -z-10 rounded-full bg-radial from-[#FF69B4]/30 via-[#6A1B9A]/18 to-transparent blur-2xl" />
       <div className="relative overflow-hidden rounded-full border border-white/10 bg-[#0f1118] p-8 shadow-[0_28px_80px_rgba(0,0,0,0.55)]">
-        <div className="mx-auto max-w-[330px] rounded-[2.2rem] border border-white/10 bg-[#171a24] p-3 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
+        <div className="mx-auto max-w-82.5 rounded-[2.2rem] border border-white/10 bg-[#171a24] p-3 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
           <div className="rounded-[1.8rem] bg-linear-to-b from-[#261b3b] via-[#191a2c] to-[#12131c] p-4">
             <div className="mb-4 h-28 rounded-2xl bg-linear-to-br from-[#ff69b4]/55 via-[#6a1b9a]/50 to-[#2196f3]/40" />
             <div className="space-y-2">
@@ -95,6 +98,7 @@ export default function Home() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [now, setNow] = useState(() => new Date());
   const [isScrolled, setIsScrolled] = useState(false);
+  const router = useRouter();
   const { data: session, status } = useSession();
   const isAuthenticated = status === 'authenticated' && Boolean(session?.user?.email);
 
@@ -136,6 +140,21 @@ export default function Home() {
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' });
+  };
+
+  const handleGetStarted = () => {
+    if (!isAuthenticated) {
+      setIsAuthModalOpen(true);
+      toast({ title: 'Please sign in to continue', variant: 'destructive' });
+      return;
+    }
+
+    const role = session?.user?.role ?? 'attendee';
+    router.push(getPostLoginRoute(role));
+  };
+
+  const handleBookDemo = () => {
+    router.push('/book-demo');
   };
 
   return (
@@ -207,10 +226,16 @@ export default function Home() {
             </p>
 
             <div className="flex flex-wrap items-center gap-3">
-              <button className="relative cursor-pointer overflow-hidden rounded-xl bg-white px-7 py-3 text-base font-semibold text-[#10121a] shadow-[0_10px_28px_rgba(0,0,0,0.35)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-10 before:rotate-12 before:bg-white/80 before:opacity-0 hover:-translate-y-0.5 hover:bg-[#f7f7f7] hover:shadow-[0_14px_36px_rgba(255,105,180,0.34)] hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF69B4]/60 active:translate-y-0 active:scale-[0.99]">
+              <button
+                onClick={handleGetStarted}
+                className="relative cursor-pointer overflow-hidden rounded-xl bg-white px-7 py-3 text-base font-semibold text-[#10121a] shadow-[0_10px_28px_rgba(0,0,0,0.35)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-10 before:rotate-12 before:bg-white/80 before:opacity-0 hover:-translate-y-0.5 hover:bg-[#f7f7f7] hover:shadow-[0_14px_36px_rgba(255,105,180,0.34)] hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF69B4]/60 active:translate-y-0 active:scale-[0.99]"
+              >
                 Get Started Free
               </button>
-              <button className="cursor-pointer rounded-xl border border-white/20 bg-white/8 px-5 py-3 text-sm font-semibold text-white/90 transition hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/14">
+              <button
+                onClick={handleBookDemo}
+                className="cursor-pointer rounded-xl border border-white/20 bg-white/8 px-5 py-3 text-sm font-semibold text-white/90 transition hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/14"
+              >
                 Book Demo
               </button>
             </div>

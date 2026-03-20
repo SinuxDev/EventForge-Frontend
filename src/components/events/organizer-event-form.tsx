@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { FormProvider, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { AttendeeFormStep } from '@/components/events/steps/attendee-form-step';
 import { BasicsStep } from '@/components/events/steps/basics-step';
 import { PublishStep } from '@/components/events/steps/publish-step';
@@ -301,7 +301,6 @@ export function OrganizerEventForm() {
     }
 
     hydratedDraftIdRef.current = loadedDraft._id;
-    setEventId(loadedDraft._id);
     form.reset(mapEventToFormValues(loadedDraft));
 
     if (draftIdFromUrl !== loadedDraft._id) {
@@ -315,8 +314,10 @@ export function OrganizerEventForm() {
         throw new Error('Session expired, please sign in again');
       }
 
-      if (eventId) {
-        return updateEventDraft(eventId, payload, accessToken);
+      const currentDraftId = eventId ?? draftIdFromUrl ?? hydratedDraftIdRef.current;
+
+      if (currentDraftId) {
+        return updateEventDraft(currentDraftId, payload, accessToken);
       }
 
       return createEventDraft(payload, accessToken);
@@ -324,7 +325,7 @@ export function OrganizerEventForm() {
     onSuccess: (event) => {
       setSuppressDraftBootstrap(false);
 
-      if (!eventId) {
+      if (!eventId && !draftIdFromUrl) {
         setEventId(event._id);
         hydratedDraftIdRef.current = event._id;
         if (draftIdFromUrl !== event._id) {
@@ -342,9 +343,11 @@ export function OrganizerEventForm() {
         throw new Error('Session expired, please sign in again');
       }
 
-      const resolvedEventId = eventId ?? (await createEventDraft(payload, accessToken))._id;
+      const currentDraftId = eventId ?? draftIdFromUrl ?? hydratedDraftIdRef.current;
 
-      if (!eventId) {
+      const resolvedEventId = currentDraftId ?? (await createEventDraft(payload, accessToken))._id;
+
+      if (!currentDraftId) {
         setEventId(resolvedEventId);
         hydratedDraftIdRef.current = resolvedEventId;
         if (draftIdFromUrl !== resolvedEventId) {
@@ -382,11 +385,12 @@ export function OrganizerEventForm() {
     }
 
     try {
+      const currentDraftId = eventId ?? draftIdFromUrl ?? hydratedDraftIdRef.current;
       const parsedValues = eventCreateSchema.parse(form.getValues());
       const payload = buildPayload(parsedValues);
 
       await saveDraftMutation.mutateAsync(payload);
-      toast({ title: eventId ? 'Draft updated' : 'Draft saved' });
+      toast({ title: currentDraftId ? 'Draft updated' : 'Draft saved' });
     } catch (error) {
       toast({
         title: error instanceof Error ? error.message : 'Unable to save draft',
@@ -428,7 +432,9 @@ export function OrganizerEventForm() {
 
   const isSaving = saveDraftMutation.isPending;
   const isPublishing = publishEventMutation.isPending;
-  const watchedValues = form.watch();
+  const watchedValues = useWatch({
+    control: form.control,
+  });
   const stepErrorCounts = useMemo(
     () => getStepErrorCounts(form.formState.errors),
     [form.formState.errors]

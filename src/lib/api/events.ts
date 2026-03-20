@@ -7,7 +7,12 @@ interface ApiEnvelope<T> {
   data: T;
 }
 
-interface PaginatedEvents {
+interface UploadCoverResponse {
+  url: string;
+  fileName: string;
+}
+
+export interface PaginatedEvents {
   data: EventEntity[];
   pagination: {
     total: number;
@@ -70,12 +75,59 @@ export async function getMyEvent(eventId: string, accessToken: string): Promise<
   return response.data;
 }
 
-export async function listMyEvents(accessToken: string): Promise<PaginatedEvents> {
-  const response = await apiClient.get<ApiEnvelope<PaginatedEvents>>('/events', {
+interface ListMyEventsOptions {
+  page?: number;
+  limit?: number;
+}
+
+export async function listMyEvents(
+  accessToken: string,
+  options: ListMyEventsOptions = {}
+): Promise<PaginatedEvents> {
+  const query = new URLSearchParams();
+  if (options.page) {
+    query.set('page', String(options.page));
+  }
+  if (options.limit) {
+    query.set('limit', String(options.limit));
+  }
+
+  const response = await apiClient.get<ApiEnvelope<PaginatedEvents>>(
+    `/events${query.toString() ? `?${query.toString()}` : ''}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  return response.data;
+}
+
+export async function uploadEventCover(
+  file: File,
+  accessToken: string
+): Promise<UploadCoverResponse> {
+  const formData = new FormData();
+  formData.append('coverImage', file);
+
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api/v1';
+  const trimmedBaseUrl = configuredBaseUrl.replace(/\/$/, '');
+  const apiBaseUrl = /\/v\d+$/.test(trimmedBaseUrl) ? trimmedBaseUrl : `${trimmedBaseUrl}/v1`;
+
+  const response = await fetch(`${apiBaseUrl}/events/upload-cover`, {
+    method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
+    body: formData,
   });
 
-  return response.data;
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({ message: response.statusText }));
+    throw new Error(errorBody?.message ?? 'Unable to upload cover image');
+  }
+
+  const json = (await response.json()) as ApiEnvelope<UploadCoverResponse>;
+  return json.data;
 }

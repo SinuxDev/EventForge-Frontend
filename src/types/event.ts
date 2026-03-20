@@ -56,6 +56,7 @@ export interface EventPayload {
 
 export interface EventEntity extends EventPayload {
   _id: string;
+  organizerId?: string;
   status: EventStatus;
   publishedAt?: string;
   createdAt: string;

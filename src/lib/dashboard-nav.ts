@@ -1,4 +1,4 @@
-import { Compass, LifeBuoy, LayoutDashboard, PlusSquare, UserRoundCog } from 'lucide-react';
+import { Compass, LayoutDashboard, LifeBuoy, PlusSquare, Rows3, UserRoundCog } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { AppUserRole } from '@/lib/auth-redirect';
 
@@ -25,7 +25,7 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
   organizer: {
     title: 'Organizer workspace',
     items: [
-      { href: '/dashboard/organizer', label: 'Overview', icon: LayoutDashboard },
+      { href: '/dashboard/organizer', label: 'My events', icon: Rows3 },
       { href: '/events/new', label: 'Create event', icon: PlusSquare },
       { href: '/book-demo', label: 'Support', icon: LifeBuoy },
     ],

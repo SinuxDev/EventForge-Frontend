@@ -101,7 +101,26 @@ export const eventCreateSchema = z
     category: z.enum(EVENT_CATEGORY_OPTIONS),
     customCategory: z.string().max(60).optional(),
     tagsRaw: z.string().optional(),
-    coverImage: z.string().url('Cover image must be a valid URL').optional().or(z.literal('')),
+    coverImage: z
+      .string()
+      .optional()
+      .or(z.literal(''))
+      .refine(
+        (value) => {
+          if (!value) {
+            return true;
+          }
+
+          if (value.startsWith('/uploads/')) {
+            return true;
+          }
+
+          return /^https?:\/\//i.test(value);
+        },
+        {
+          message: 'Cover image must be a valid uploaded path or URL',
+        }
+      ),
     attendanceMode: z.enum(['in_person', 'online', 'hybrid']),
     venueName: z.string().optional(),
     addressLine1: z.string().optional(),

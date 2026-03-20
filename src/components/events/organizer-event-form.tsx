@@ -41,6 +41,33 @@ import type {
   EventTicketInput,
 } from '@/types/event';
 
+interface ApiFieldError {
+  conflictEventId?: string;
+  conflictTitle?: string;
+  conflictStartDateTime?: string;
+  conflictEndDateTime?: string;
+}
+
+function extractConflictMessage(error: unknown): string | null {
+  if (!(error instanceof Error)) {
+    return null;
+  }
+
+  const message = error.message;
+  if (!message.includes('Schedule overlaps with existing event')) {
+    return null;
+  }
+
+  const maybePayload = (error as Error & { cause?: { data?: ApiFieldError[] } }).cause;
+  const conflictData = maybePayload?.data?.[0];
+
+  if (!conflictData?.conflictTitle) {
+    return message;
+  }
+
+  return `Schedule overlaps with '${conflictData.conflictTitle}'. Please choose another time window.`;
+}
+
 const EMPTY_FORM_DEFAULTS: EventCreateFormValues = {
   title: '',
   shortSummary: '',
@@ -390,10 +417,18 @@ export function OrganizerEventForm() {
       const payload = buildPayload(parsedValues);
 
       await saveDraftMutation.mutateAsync(payload);
-      toast({ title: currentDraftId ? 'Draft updated' : 'Draft saved' });
-    } catch (error) {
       toast({
-        title: error instanceof Error ? error.message : 'Unable to save draft',
+        title: isPublishedEvent
+          ? 'Published event updated'
+          : currentDraftId
+            ? 'Draft updated'
+            : 'Draft saved',
+      });
+    } catch (error) {
+      const conflictMessage = extractConflictMessage(error);
+
+      toast({
+        title: conflictMessage ?? (error instanceof Error ? error.message : 'Unable to save draft'),
         variant: 'destructive',
       });
     }
@@ -432,6 +467,15 @@ export function OrganizerEventForm() {
 
   const isSaving = saveDraftMutation.isPending;
   const isPublishing = publishEventMutation.isPending;
+  const currentEventStatus =
+    saveDraftMutation.data?.status ?? draftBootstrapQuery.data?.status ?? null;
+  const endDateTimeValue = useWatch({ control: form.control, name: 'endDateTime' });
+  const isFinishedEvent =
+    currentEventStatus !== null && endDateTimeValue
+      ? new Date(endDateTimeValue) < new Date()
+      : false;
+  const isPublishedEvent = currentEventStatus === 'published';
+
   const watchedValues = useWatch({
     control: form.control,
   });
@@ -476,6 +520,18 @@ export function OrganizerEventForm() {
           <p className="mt-1 text-sm text-white/70">
             Build a single-date event with ticketing, attendee questions, and publish controls.
           </p>
+
+          {isPublishedEvent ? (
+            <p className="mt-2 text-xs text-[#9ef0e6]">
+              Editing a published event: date/time changes are allowed only forward.
+            </p>
+          ) : null}
+
+          {isFinishedEvent ? (
+            <p className="mt-2 text-xs text-[#ffc2df]">
+              This event has finished. Editing is disabled.
+            </p>
+          ) : null}
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -527,7 +583,7 @@ export function OrganizerEventForm() {
 
                 setStep((current) => Math.min(STEP_TITLES.length - 1, current + 1));
               }}
-              disabled={step === STEP_TITLES.length - 1}
+              disabled={step === STEP_TITLES.length - 1 || isFinishedEvent}
             >
               Next
             </Button>
@@ -541,11 +597,21 @@ export function OrganizerEventForm() {
               type="button"
               variant="secondary"
               onClick={saveDraft}
-              disabled={isSaving || isPublishing}
+              disabled={isSaving || isPublishing || isFinishedEvent}
             >
-              {isSaving ? 'Saving...' : 'Save Draft'}
+              {isSaving
+                ? 'Saving...'
+                : currentEventStatus === 'published'
+                  ? 'Update Event'
+                  : 'Save Draft'}
             </Button>
-            <Button type="button" onClick={handlePublish} disabled={isSaving || isPublishing}>
+            <Button
+              type="button"
+              onClick={handlePublish}
+              disabled={
+                isSaving || isPublishing || isFinishedEvent || currentEventStatus === 'published'
+              }
+            >
               {isPublishing ? 'Publishing...' : 'Publish Event'}
             </Button>
           </div>

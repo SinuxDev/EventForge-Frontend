@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
+import { PublishSuccessToast } from '@/components/dashboard/publish-success-toast';
 import {
   Select,
   SelectContent,
@@ -175,7 +176,8 @@ export default function AdminDashboardPage() {
 
   return (
     <DashboardShell requiredRole="admin">
-      <section className="mx-auto w-full max-w-5xl space-y-5">
+      <PublishSuccessToast />
+      <section className="w-full space-y-5">
         <section className="rounded-2xl border border-white/12 bg-white/6 p-6 backdrop-blur">
           <p className="text-xs uppercase tracking-[0.16em] text-white/55">Admin dashboard</p>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -236,7 +238,7 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="mt-4 overflow-x-auto rounded-xl border border-white/12 bg-[#10141f]/70">
-            <table className="w-full min-w-[780px] border-collapse">
+            <table className="w-full min-w-195 border-collapse">
               <thead className="bg-white/4 text-left text-xs uppercase tracking-[0.12em] text-white/52">
                 <tr>
                   <th className="px-4 py-3">User</th>
@@ -271,7 +273,7 @@ export default function AdminDashboardPage() {
                           value={user.role}
                           onValueChange={(value) => handleRoleChange(user._id, value as UserRole)}
                         >
-                          <SelectTrigger className="h-9 w-[150px]">
+                          <SelectTrigger className="h-9 w-37.5">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
+import { PublishSuccessToast } from '@/components/dashboard/publish-success-toast';
 
 const organizerStats = [
   { label: 'Upcoming events', value: '3' },
@@ -16,7 +17,8 @@ export default function OrganizerDashboardPage() {
 
   return (
     <DashboardShell requiredRole="organizer">
-      <section className="mx-auto w-full max-w-5xl space-y-6">
+      <PublishSuccessToast />
+      <section className="w-full space-y-6">
         <div className="rounded-2xl border border-white/12 bg-white/6 p-6 backdrop-blur">
           <p className="text-xs uppercase tracking-[0.16em] text-white/55">Organizer dashboard</p>
           <h1 className="mt-3 text-3xl font-bold">

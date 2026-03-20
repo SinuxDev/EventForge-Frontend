@@ -9,31 +9,72 @@ import { useEffect, useMemo, useState } from 'react';
 import { DashboardSidebar } from '@/components/dashboard/dashboard-sidebar';
 import { getPostLoginRoute, type AppUserRole } from '@/lib/auth-redirect';
 import { getDashboardNavConfig } from '@/lib/dashboard-nav';
+import { useDashboardShellStore } from '@/stores/dashboard-shell-store';
 
 interface DashboardShellProps {
-  requiredRole: AppUserRole;
+  requiredRole?: AppUserRole;
+  allowedRoles?: AppUserRole[];
+  navRole?: AppUserRole;
   children: ReactNode;
 }
 
-export function DashboardShell({ requiredRole, children }: DashboardShellProps) {
+function getRoleLabel(role: AppUserRole): string {
+  if (role === 'admin') {
+    return 'Admin';
+  }
+
+  if (role === 'organizer') {
+    return 'Organizer';
+  }
+
+  return 'Attendee';
+}
+
+export function DashboardShell({
+  requiredRole,
+  allowedRoles,
+  navRole,
+  children,
+}: DashboardShellProps) {
   const { status, data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const isDesktopSidebarCollapsed = useDashboardShellStore(
+    (state) => state.isDesktopSidebarCollapsed
+  );
+  const toggleDesktopSidebar = useDashboardShellStore((state) => state.toggleDesktopSidebar);
 
-  const navConfig = useMemo(() => getDashboardNavConfig(requiredRole), [requiredRole]);
-
-  const dashboardLabel = useMemo(() => {
-    if (requiredRole === 'admin') {
-      return 'Admin';
+  const effectiveAllowedRoles = useMemo(() => {
+    if (allowedRoles && allowedRoles.length > 0) {
+      return allowedRoles;
     }
 
-    if (requiredRole === 'organizer') {
-      return 'Organizer';
+    if (requiredRole) {
+      return [requiredRole];
     }
 
-    return 'Attendee';
-  }, [requiredRole]);
+    return ['attendee', 'organizer', 'admin'] as AppUserRole[];
+  }, [allowedRoles, requiredRole]);
+
+  const effectiveNavRole = useMemo(() => {
+    if (navRole) {
+      return navRole;
+    }
+
+    if (requiredRole) {
+      return requiredRole;
+    }
+
+    if (session?.user?.role) {
+      return session.user.role;
+    }
+
+    return 'attendee' as AppUserRole;
+  }, [navRole, requiredRole, session]);
+
+  const navConfig = useMemo(() => getDashboardNavConfig(effectiveNavRole), [effectiveNavRole]);
+  const dashboardLabel = useMemo(() => getRoleLabel(effectiveNavRole), [effectiveNavRole]);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' });
@@ -53,10 +94,10 @@ export function DashboardShell({ requiredRole, children }: DashboardShellProps) 
       return;
     }
 
-    if (session.user.role !== requiredRole) {
+    if (!effectiveAllowedRoles.includes(session.user.role)) {
       router.replace(getPostLoginRoute(session.user.role));
     }
-  }, [requiredRole, router, session?.user?.role, status]);
+  }, [effectiveAllowedRoles, router, session?.user?.role, status]);
 
   if (status === 'loading') {
     return (
@@ -66,7 +107,7 @@ export function DashboardShell({ requiredRole, children }: DashboardShellProps) 
     );
   }
 
-  if (status !== 'authenticated' || session?.user?.role !== requiredRole) {
+  if (status !== 'authenticated' || !effectiveAllowedRoles.includes(session.user.role)) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#0b0d13] px-6 text-white">
         <div className="w-full max-w-xl rounded-2xl border border-white/12 bg-white/5 p-8 text-center backdrop-blur">
@@ -111,17 +152,26 @@ export function DashboardShell({ requiredRole, children }: DashboardShellProps) 
         </div>
       </header>
 
-      <div className="grid w-full grid-cols-1 lg:grid-cols-[280px_1fr]">
+      <div
+        className="grid w-full grid-cols-1 transition-[grid-template-columns] duration-300 lg:grid-cols-[var(--dashboard-sidebar-width)_1fr]"
+        style={
+          {
+            '--dashboard-sidebar-width': isDesktopSidebarCollapsed ? '82px' : '280px',
+          } as React.CSSProperties
+        }
+      >
         <div className="hidden min-h-[calc(100vh-4rem)] lg:block">
           <DashboardSidebar
             title={navConfig.title}
             items={navConfig.items}
             activePath={pathname}
+            isCollapsed={isDesktopSidebarCollapsed}
+            onToggleCollapse={toggleDesktopSidebar}
             onSignOut={handleSignOut}
           />
         </div>
 
-        <main className="px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+        <main className="px-3 py-6 sm:px-4 sm:py-8">{children}</main>
       </div>
 
       {isMobileSidebarOpen ? (

@@ -9,7 +9,7 @@ export default function AttendeeDashboardPage() {
 
   return (
     <DashboardShell requiredRole="attendee">
-      <section className="mx-auto w-full max-w-5xl space-y-6">
+      <section className="w-full space-y-6">
         <section className="rounded-2xl border border-white/12 bg-white/6 p-6 backdrop-blur">
           <p className="text-xs uppercase tracking-[0.16em] text-white/55">Attendee dashboard</p>
           <h1 className="mt-3 text-3xl font-bold">Welcome, {session?.user?.name || 'Attendee'}</h1>

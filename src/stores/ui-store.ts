@@ -1,9 +1,9 @@
 // ─── UI Store (Zustand) ───────────────────────────────────────────────────────
 // Manages global UI state: theme and modal visibility.
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-type Theme = "light" | "dark" | "system";
+export type Theme = 'light' | 'dark' | 'system';
 
 interface UiState {
   theme: Theme;
@@ -18,13 +18,13 @@ interface UiState {
 export const useUiStore = create<UiState>()(
   persist(
     (set) => ({
-      theme: "system",
+      theme: 'dark',
       setTheme: (theme) => set({ theme }),
       isRsvpModalOpen: false,
       rsvpEventId: null,
       openRsvpModal: (eventId) => set({ isRsvpModalOpen: true, rsvpEventId: eventId }),
       closeRsvpModal: () => set({ isRsvpModalOpen: false, rsvpEventId: null }),
     }),
-    { name: "eventforge-ui", partialize: (state) => ({ theme: state.theme }) }
+    { name: 'eventforge-ui', partialize: (state) => ({ theme: state.theme }) }
   )
 );

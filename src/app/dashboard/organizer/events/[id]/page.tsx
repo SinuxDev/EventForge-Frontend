@@ -48,23 +48,23 @@ export default function OrganizerEventDetailPage() {
     <DashboardShell requiredRole="organizer">
       <section className="w-full space-y-6">
         {eventsQuery.isLoading ? (
-          <div className="rounded-xl border border-white/12 bg-white/5 p-6 text-sm text-white/70">
+          <div className="rounded-xl border border-border bg-card/70 p-6 text-sm text-muted-foreground">
             Loading event details...
           </div>
         ) : !event ? (
-          <div className="rounded-xl border border-[#ff69b4]/35 bg-[#ff69b4]/12 p-6">
-            <p className="text-sm text-[#ffc2df]">Event not found in your organizer workspace.</p>
+          <div className="rounded-xl border border-destructive/35 bg-destructive/10 p-6">
+            <p className="text-sm text-destructive">Event not found in your organizer workspace.</p>
             <Link
               href="/dashboard/organizer"
-              className="mt-4 inline-flex rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white"
+              className="mt-4 inline-flex rounded-lg border border-border bg-background/80 px-4 py-2 text-sm font-medium text-foreground"
             >
               Back to My events
             </Link>
           </div>
         ) : (
           <>
-            <div className="rounded-2xl border border-white/12 bg-white/6 p-6 backdrop-blur">
-              <div className="mb-5 overflow-hidden rounded-xl border border-white/12 bg-black/25">
+            <div className="rounded-2xl border border-border bg-card/80 p-6 backdrop-blur">
+              <div className="mb-5 overflow-hidden rounded-xl border border-border bg-muted/30">
                 {event.coverImage ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -73,24 +73,24 @@ export default function OrganizerEventDetailPage() {
                     className="h-52 w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-52 items-center justify-center text-sm text-white/45">
+                  <div className="flex h-52 items-center justify-center text-sm text-muted-foreground">
                     No cover image uploaded
                   </div>
                 )}
               </div>
 
-              <p className="text-xs uppercase tracking-[0.14em] text-white/55">
+              <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
                 Organizer / Events / Detail
               </p>
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                <h1 className="text-3xl font-bold text-white">{event.title}</h1>
-                <span className="rounded-full border border-[#00A896]/35 bg-[#00A896]/12 px-3 py-1 text-xs font-medium text-[#9ef0e6]">
+                <h1 className="text-3xl font-bold text-foreground">{event.title}</h1>
+                <span className="rounded-full border border-primary/35 bg-primary/12 px-3 py-1 text-xs font-medium text-primary">
                   {event.status}
                 </span>
               </div>
-              <p className="mt-3 text-sm text-white/70">{event.shortSummary}</p>
+              <p className="mt-3 text-sm text-muted-foreground">{event.shortSummary}</p>
 
-              <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-white/65">
+              <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5">
                   <CalendarClock className="h-4 w-4" />
                   {formatEventDate(event.startDateTime, event.timezone)}
@@ -107,17 +107,17 @@ export default function OrganizerEventDetailPage() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-              <section className="rounded-xl border border-white/12 bg-white/5 p-5">
-                <h2 className="text-lg font-semibold text-white">Description</h2>
-                <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-white/75">
+              <section className="rounded-xl border border-border bg-card/70 p-5">
+                <h2 className="text-lg font-semibold text-foreground">Description</h2>
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
                   {event.description}
                 </p>
               </section>
 
               <section className="space-y-4">
-                <article className="rounded-xl border border-white/12 bg-white/5 p-5">
-                  <h3 className="text-base font-semibold text-white">Ticket overview</h3>
-                  <p className="mt-2 text-sm text-white/65">
+                <article className="rounded-xl border border-border bg-card/70 p-5">
+                  <h3 className="text-base font-semibold text-foreground">Ticket overview</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
                     {event.tickets.reduce((sum, ticket) => sum + ticket.quantity, 0)} /{' '}
                     {event.capacity} seats configured
                   </p>
@@ -125,13 +125,13 @@ export default function OrganizerEventDetailPage() {
                     {event.tickets.map((ticket, index) => (
                       <li
                         key={`${event._id}-${ticket.name}-${index}`}
-                        className="rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-sm text-white/78"
+                        className="rounded-lg border border-border bg-background/70 px-3 py-2 text-sm text-foreground"
                       >
                         <span className="inline-flex items-center gap-2">
-                          <Ticket className="h-4 w-4 text-white/60" />
+                          <Ticket className="h-4 w-4 text-muted-foreground" />
                           {ticket.name}
                         </span>
-                        <span className="ml-2 text-xs text-white/55">
+                        <span className="ml-2 text-xs text-muted-foreground">
                           {ticket.type === 'paid'
                             ? `${ticket.currency ?? 'USD'} ${ticket.price ?? 0}`
                             : 'Free'}{' '}
@@ -142,18 +142,18 @@ export default function OrganizerEventDetailPage() {
                   </ul>
                 </article>
 
-                <article className="rounded-xl border border-white/12 bg-white/5 p-5">
-                  <h3 className="text-base font-semibold text-white">Actions</h3>
+                <article className="rounded-xl border border-border bg-card/70 p-5">
+                  <h3 className="text-base font-semibold text-foreground">Actions</h3>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Link
                       href={`/events/new?draftId=${event._id}`}
-                      className="inline-flex h-9 items-center rounded-lg border border-white/20 bg-white/10 px-4 text-sm font-medium text-white/90"
+                      className="inline-flex h-9 items-center rounded-lg border border-border bg-background/80 px-4 text-sm font-medium text-foreground"
                     >
                       Edit event
                     </Link>
                     <Link
                       href="/dashboard/organizer"
-                      className="inline-flex h-9 items-center rounded-lg border border-white/20 bg-white/10 px-4 text-sm font-medium text-white/90"
+                      className="inline-flex h-9 items-center rounded-lg border border-border bg-background/80 px-4 text-sm font-medium text-foreground"
                     >
                       Back to My events
                     </Link>

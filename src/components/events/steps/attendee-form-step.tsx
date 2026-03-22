@@ -24,34 +24,34 @@ export function AttendeeFormStep({ questionsFieldArray }: AttendeeFormStepProps)
     <>
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Organizer name</span>
+          <span className="text-sm text-muted-foreground">Organizer name</span>
           <input
             {...form.register('organizerName')}
-            className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm"
+            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none focus:border-ring"
           />
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Contact email</span>
+          <span className="text-sm text-muted-foreground">Contact email</span>
           <input
             {...form.register('contactEmail')}
-            className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm"
+            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none focus:border-ring"
           />
         </label>
       </div>
 
       <label className="block space-y-2">
-        <span className="text-sm text-white/70">Refund policy</span>
+        <span className="text-sm text-muted-foreground">Refund policy</span>
         <textarea
           {...form.register('refundPolicy')}
-          className="min-h-25 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 py-3 text-sm"
+          className="min-h-25 w-full rounded-xl border border-input bg-background/85 px-3.5 py-3 text-sm text-foreground outline-none focus:border-ring"
           placeholder="State cancellation and refund terms"
         />
       </label>
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-white/85">Custom questions</h3>
+          <h3 className="text-sm font-semibold text-foreground">Custom questions</h3>
           <Button
             type="button"
             variant="outline"
@@ -69,11 +69,11 @@ export function AttendeeFormStep({ questionsFieldArray }: AttendeeFormStepProps)
         </div>
 
         {questionsFieldArray.fields.map((field, index) => (
-          <div key={field.id} className="rounded-xl border border-white/12 bg-white/4 p-3">
+          <div key={field.id} className="rounded-xl border border-border bg-card/65 p-3">
             <div className="grid gap-3 md:grid-cols-[1fr_180px_120px_44px]">
               <input
                 {...form.register(`attendeeQuestions.${index}.label`)}
-                className="h-10 rounded-lg border border-white/15 bg-black/25 px-3 text-sm"
+                className="h-10 rounded-lg border border-input bg-background/85 px-3 text-sm text-foreground"
                 placeholder="Question label"
               />
 
@@ -102,7 +102,7 @@ export function AttendeeFormStep({ questionsFieldArray }: AttendeeFormStepProps)
                 </SelectContent>
               </Select>
 
-              <label className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-white/15 bg-black/25 px-3 text-xs text-white/75">
+              <label className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-border bg-muted/45 px-3 text-xs text-muted-foreground">
                 <input type="checkbox" {...form.register(`attendeeQuestions.${index}.required`)} />
                 Required
               </label>
@@ -110,7 +110,7 @@ export function AttendeeFormStep({ questionsFieldArray }: AttendeeFormStepProps)
               <button
                 type="button"
                 onClick={() => questionsFieldArray.remove(index)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-white/8 text-white/75 hover:text-white"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background/75 text-muted-foreground transition hover:border-ring/40 hover:text-foreground"
                 title="Remove question"
               >
                 <Trash2 className="h-4 w-4" />
@@ -119,7 +119,7 @@ export function AttendeeFormStep({ questionsFieldArray }: AttendeeFormStepProps)
 
             <input
               {...form.register(`attendeeQuestions.${index}.optionsRaw`)}
-              className="mt-3 h-10 w-full rounded-lg border border-white/15 bg-black/25 px-3 text-sm"
+              className="mt-3 h-10 w-full rounded-lg border border-input bg-background/85 px-3 text-sm text-foreground"
               placeholder="Options (comma separated)"
             />
           </div>

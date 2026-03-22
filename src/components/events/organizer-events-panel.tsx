@@ -45,14 +45,14 @@ const STATUS_OPTIONS: Array<{ value: StatusFilter; label: string }> = [
 
 function getStatusChipClass(status: EventStatus): string {
   if (status === 'published') {
-    return 'border-[#00A896]/35 bg-[#00A896]/12 text-[#9ef0e6]';
+    return 'border-primary/35 bg-primary/12 text-primary';
   }
 
   if (status === 'draft') {
-    return 'border-white/24 bg-white/10 text-white/85';
+    return 'border-border bg-muted/60 text-foreground';
   }
 
-  return 'border-[#ff69b4]/35 bg-[#ff69b4]/12 text-[#ffb7da]';
+  return 'border-destructive/35 bg-destructive/12 text-destructive';
 }
 
 function formatEventDate(value: string, timezone: string): string {
@@ -136,12 +136,14 @@ export function OrganizerEventsPanel() {
 
   return (
     <section className="w-full space-y-6">
-      <div className="rounded-2xl border border-white/12 bg-white/6 p-6 backdrop-blur">
+      <div className="rounded-2xl border border-border bg-card/80 p-6 backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.16em] text-white/55">Organizer events</p>
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              Organizer events
+            </p>
             <h1 className="mt-3 text-3xl font-bold">My events</h1>
-            <p className="mt-3 text-sm text-white/70">
+            <p className="mt-3 text-sm text-muted-foreground">
               Track your created events, publish drafts, and jump to edits fast.
             </p>
           </div>
@@ -149,12 +151,12 @@ export function OrganizerEventsPanel() {
           <div className="flex items-center gap-3">
             <Link
               href="/events/new"
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#00A896]/45 bg-[#00A896]/18 px-4 text-sm font-semibold text-[#b8fff8] transition hover:border-[#00A896]/65 hover:bg-[#00A896]/24"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-primary/45 bg-primary/16 px-4 text-sm font-semibold text-primary transition hover:border-primary/65 hover:bg-primary/24"
             >
               <Plus className="h-4 w-4" />
               Create Event
             </Link>
-            <span className="rounded-full border border-white/20 bg-white/8 px-3 py-1 text-xs text-white/75">
+            <span className="rounded-full border border-border bg-background/70 px-3 py-1 text-xs text-muted-foreground">
               Upcoming default
             </span>
           </div>
@@ -162,33 +164,33 @@ export function OrganizerEventsPanel() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <article className="rounded-xl border border-white/12 bg-white/5 p-4">
-          <p className="text-xs uppercase tracking-[0.12em] text-white/50">Total events</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{metrics.total}</p>
+        <article className="rounded-xl border border-border bg-card/70 p-4">
+          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Total events</p>
+          <p className="mt-2 text-2xl font-semibold text-foreground">{metrics.total}</p>
         </article>
-        <article className="rounded-xl border border-white/12 bg-white/5 p-4">
-          <p className="text-xs uppercase tracking-[0.12em] text-white/50">Draft</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{metrics.draft}</p>
+        <article className="rounded-xl border border-border bg-card/70 p-4">
+          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Draft</p>
+          <p className="mt-2 text-2xl font-semibold text-foreground">{metrics.draft}</p>
         </article>
-        <article className="rounded-xl border border-white/12 bg-white/5 p-4">
-          <p className="text-xs uppercase tracking-[0.12em] text-white/50">Published</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{metrics.published}</p>
+        <article className="rounded-xl border border-border bg-card/70 p-4">
+          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Published</p>
+          <p className="mt-2 text-2xl font-semibold text-foreground">{metrics.published}</p>
         </article>
-        <article className="rounded-xl border border-white/12 bg-white/5 p-4">
-          <p className="text-xs uppercase tracking-[0.12em] text-white/50">Upcoming</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{metrics.upcoming}</p>
+        <article className="rounded-xl border border-border bg-card/70 p-4">
+          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Upcoming</p>
+          <p className="mt-2 text-2xl font-semibold text-foreground">{metrics.upcoming}</p>
         </article>
       </div>
 
-      <section className="rounded-2xl border border-white/12 bg-white/6 p-4 backdrop-blur md:p-5">
+      <section className="rounded-2xl border border-border bg-card/80 p-4 backdrop-blur md:p-5">
         <div className="grid gap-3 md:grid-cols-[1.2fr_0.6fr_0.6fr_auto]">
           <label className="relative block">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/45" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search by title, summary, category"
-              className="h-11 w-full rounded-xl border border-white/15 bg-black/30 pl-9 pr-3 text-sm outline-none transition focus:border-[#00A896]"
+              className="h-11 w-full rounded-xl border border-input bg-background/85 pl-9 pr-3 text-sm text-foreground outline-none transition focus:border-ring"
             />
           </label>
 
@@ -221,7 +223,7 @@ export function OrganizerEventsPanel() {
           <Button
             type="button"
             variant="outline"
-            className="h-11 border-white/22 bg-white/10 text-white/85 hover:border-white/38 hover:bg-white/15"
+            className="h-11 border-border bg-background/80 text-foreground hover:border-ring/35 hover:bg-muted"
             onClick={clearFilters}
           >
             Clear filters
@@ -230,16 +232,16 @@ export function OrganizerEventsPanel() {
 
         <div className="mt-5 space-y-3">
           {eventsQuery.isLoading ? (
-            <div className="rounded-xl border border-white/12 bg-white/4 p-5 text-sm text-white/70">
+            <div className="rounded-xl border border-border bg-muted/35 p-5 text-sm text-muted-foreground">
               Loading your events...
             </div>
           ) : eventsQuery.isError ? (
-            <div className="rounded-xl border border-[#ff69b4]/35 bg-[#ff69b4]/12 p-5 text-sm text-[#ffc2df]">
+            <div className="rounded-xl border border-destructive/35 bg-destructive/10 p-5 text-sm text-destructive">
               Unable to load events. Please retry.
             </div>
           ) : filteredEvents.length === 0 ? (
-            <div className="rounded-xl border border-white/12 bg-white/4 p-5 text-center">
-              <p className="text-sm text-white/70">
+            <div className="rounded-xl border border-border bg-muted/35 p-5 text-center">
+              <p className="text-sm text-muted-foreground">
                 {metrics.total === 0
                   ? 'No events created yet. Create your first event to get started.'
                   : 'No events match the active filters.'}
@@ -247,7 +249,7 @@ export function OrganizerEventsPanel() {
               <div className="mt-4 flex items-center justify-center gap-2">
                 <Link
                   href="/events/new"
-                  className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#00A896]/45 bg-[#00A896]/18 px-4 text-sm font-semibold text-[#b8fff8]"
+                  className="inline-flex h-10 items-center gap-2 rounded-lg border border-primary/45 bg-primary/16 px-4 text-sm font-semibold text-primary"
                 >
                   <Plus className="h-4 w-4" />
                   Create Event
@@ -256,7 +258,7 @@ export function OrganizerEventsPanel() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="h-10 border-white/22 bg-white/10 text-white/85"
+                    className="h-10 border-border bg-background/80 text-foreground"
                     onClick={clearFilters}
                   >
                     Reset filters
@@ -274,9 +276,9 @@ export function OrganizerEventsPanel() {
                 return (
                   <article
                     key={event._id}
-                    className="group overflow-hidden rounded-2xl border border-white/12 bg-[linear-gradient(160deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))] transition hover:border-white/25"
+                    className="group overflow-hidden rounded-2xl border border-border bg-card/85 transition hover:border-ring/30"
                   >
-                    <div className="relative h-44 border-b border-white/10 bg-black/30">
+                    <div className="relative h-44 border-b border-border bg-muted/35">
                       {event.coverImage ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -285,12 +287,12 @@ export function OrganizerEventsPanel() {
                           className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center text-sm text-white/45">
+                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                           No cover image
                         </div>
                       )}
 
-                      <div className="absolute inset-0 bg-linear-to-t from-[#070a11]/90 via-[#070a11]/25 to-transparent" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/35 via-black/10 to-transparent dark:from-[#070a11]/90 dark:via-[#070a11]/25" />
 
                       <div className="absolute left-3 top-3 flex items-center gap-2">
                         <span
@@ -300,8 +302,8 @@ export function OrganizerEventsPanel() {
                         </span>
                       </div>
 
-                      <div className="absolute bottom-3 left-3 right-3 text-xs text-white/85">
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-2.5 py-1 backdrop-blur">
+                      <div className="absolute bottom-3 left-3 right-3 text-xs text-foreground">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-2.5 py-1 backdrop-blur dark:border-white/20 dark:bg-black/45 dark:text-white/90">
                           <CalendarClock className="h-3.5 w-3.5" />
                           {formatEventDate(event.startDateTime, event.timezone)}
                         </span>
@@ -310,27 +312,29 @@ export function OrganizerEventsPanel() {
 
                     <div className="space-y-4 p-4">
                       <div className="space-y-1.5">
-                        <h3 className="line-clamp-1 text-lg font-semibold text-white">
+                        <h3 className="line-clamp-1 text-lg font-semibold text-foreground">
                           {event.title}
                         </h3>
-                        <p className="line-clamp-2 text-sm text-white/68">{event.shortSummary}</p>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">
+                          {event.shortSummary}
+                        </p>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/16 bg-white/8 px-2.5 py-1 text-white/70">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-2.5 py-1 text-muted-foreground">
                           <CalendarRange className="h-3.5 w-3.5" />
                           {getLocationLabel(event)}
                         </span>
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/16 bg-white/8 px-2.5 py-1 text-white/70">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-2.5 py-1 text-muted-foreground">
                           <CircleDot className="h-3.5 w-3.5" />
                           {seats}/{event.capacity} seats
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2 border-t border-white/10 pt-3">
+                      <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
                         <Link
                           href={`/dashboard/organizer/events/${event._id}`}
-                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#00A896]/35 bg-[#00A896]/12 px-3 text-sm font-medium text-[#9ef0e6] transition hover:border-[#00A896]/55 hover:bg-[#00A896]/18"
+                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-primary/35 bg-primary/12 px-3 text-sm font-medium text-primary transition hover:border-primary/55 hover:bg-primary/18"
                         >
                           <Eye className="h-4 w-4" />
                           Details
@@ -338,7 +342,7 @@ export function OrganizerEventsPanel() {
 
                         <Link
                           href={`/events/new?draftId=${event._id}`}
-                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-white/20 bg-white/10 px-3 text-sm font-medium text-white/90 transition hover:border-white/35 hover:bg-white/16"
+                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background/80 px-3 text-sm font-medium text-foreground transition hover:border-ring/35 hover:bg-muted"
                         >
                           <FilePenLine className="h-4 w-4" />
                           Edit

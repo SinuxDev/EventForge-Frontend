@@ -93,14 +93,14 @@ export function BasicsStep() {
 
   return (
     <>
-      <div className="rounded-xl border border-white/12 bg-white/4 p-4">
-        <p className="text-sm font-medium text-white/85">Cover image</p>
-        <p className="mt-1 text-xs text-white/55">
+      <div className="rounded-xl border border-border bg-card/70 p-4 backdrop-blur">
+        <p className="text-sm font-medium text-foreground">Cover image</p>
+        <p className="mt-1 text-xs text-muted-foreground">
           Auto-upload on selection (JPEG, PNG, WEBP up to 5MB)
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 text-sm font-medium text-white/90 transition hover:border-white/35 hover:bg-white/16">
+          <label className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-lg border border-border bg-background/80 px-4 text-sm font-medium text-foreground transition hover:border-ring/40 hover:bg-muted">
             {isUploadingCover ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
@@ -120,19 +120,19 @@ export function BasicsStep() {
             <button
               type="button"
               onClick={handleRemoveCoverImage}
-              className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/18 bg-white/8 px-3 text-sm text-white/75 transition hover:border-white/32 hover:text-white"
+              className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-background/70 px-3 text-sm text-muted-foreground transition hover:border-ring/35 hover:text-foreground"
             >
               <X className="h-4 w-4" /> Remove
             </button>
           ) : null}
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-lg border border-white/12 bg-black/25">
+        <div className="mt-4 overflow-hidden rounded-lg border border-border bg-muted/30">
           {coverPreviewUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={coverPreviewUrl} alt="Event cover" className="h-40 w-full object-cover" />
           ) : (
-            <div className="flex h-40 items-center justify-center text-white/45">
+            <div className="flex h-40 items-center justify-center text-muted-foreground">
               <div className="inline-flex items-center gap-2 text-sm">
                 <ImageIcon className="h-4 w-4" /> No cover image selected
               </div>
@@ -142,38 +142,38 @@ export function BasicsStep() {
       </div>
 
       <label className="block space-y-2">
-        <span className="text-sm text-white/70">Event title</span>
+        <span className="text-sm text-muted-foreground">Event title</span>
         <input
           {...form.register('title')}
-          className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm outline-none transition focus:border-[#00A896]"
+          className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
           placeholder="e.g. EventForge Growth Summit 2026"
         />
-        <p className="text-xs text-[#ff9ec9]">{form.formState.errors.title?.message}</p>
+        <p className="text-xs text-destructive">{form.formState.errors.title?.message}</p>
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm text-white/70">Short summary</span>
+        <span className="text-sm text-muted-foreground">Short summary</span>
         <input
           {...form.register('shortSummary')}
-          className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm outline-none transition focus:border-[#00A896]"
+          className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
           placeholder="One line that explains the value"
         />
-        <p className="text-xs text-[#ff9ec9]">{form.formState.errors.shortSummary?.message}</p>
+        <p className="text-xs text-destructive">{form.formState.errors.shortSummary?.message}</p>
       </label>
 
       <label className="block space-y-2">
-        <span className="text-sm text-white/70">Description</span>
+        <span className="text-sm text-muted-foreground">Description</span>
         <textarea
           {...form.register('description')}
-          className="min-h-30 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 py-3 text-sm outline-none transition focus:border-[#00A896]"
+          className="min-h-30 w-full rounded-xl border border-input bg-background/85 px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
           placeholder="Write the full event details"
         />
-        <p className="text-xs text-[#ff9ec9]">{form.formState.errors.description?.message}</p>
+        <p className="text-xs text-destructive">{form.formState.errors.description?.message}</p>
       </label>
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Category</span>
+          <span className="text-sm text-muted-foreground">Category</span>
           <Select
             value={selectedCategory}
             onValueChange={(value) => {
@@ -194,14 +194,14 @@ export function BasicsStep() {
               ))}
             </SelectContent>
           </Select>
-          <p className="text-xs text-[#ff9ec9]">{form.formState.errors.category?.message}</p>
+          <p className="text-xs text-destructive">{form.formState.errors.category?.message}</p>
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Tags (comma separated)</span>
+          <span className="text-sm text-muted-foreground">Tags (comma separated)</span>
           <input
             {...form.register('tagsRaw')}
-            className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm outline-none transition focus:border-[#00A896]"
+            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
             placeholder="growth, startup, marketing"
           />
         </label>
@@ -209,13 +209,15 @@ export function BasicsStep() {
 
       {selectedCategory === 'other' ? (
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Custom category</span>
+          <span className="text-sm text-muted-foreground">Custom category</span>
           <input
             {...form.register('customCategory')}
-            className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm outline-none transition focus:border-[#00A896]"
+            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
             placeholder="Enter your custom category"
           />
-          <p className="text-xs text-[#ff9ec9]">{form.formState.errors.customCategory?.message}</p>
+          <p className="text-xs text-destructive">
+            {form.formState.errors.customCategory?.message}
+          </p>
         </label>
       ) : null}
     </>

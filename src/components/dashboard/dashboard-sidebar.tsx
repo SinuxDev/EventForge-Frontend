@@ -33,14 +33,14 @@ export function DashboardSidebar({
   return (
     <aside
       className={cn(
-        'relative flex h-full w-full flex-col border-r border-white/10 bg-[#0f121b]/90 backdrop-blur-xl transition-all duration-300',
+        'relative flex h-full w-full flex-col border-r border-border/80 bg-card/88 backdrop-blur-xl transition-all duration-300',
         isCollapsed ? 'p-3' : 'p-4'
       )}
     >
       {onToggleCollapse ? (
         <button
           onClick={onToggleCollapse}
-          className="absolute -right-3 top-8 hidden h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-[#151b27] text-white/85 shadow-[0_10px_22px_rgba(0,0,0,0.35)] transition hover:border-white/35 hover:bg-[#1b2231] lg:inline-flex"
+          className="absolute -right-3 top-8 hidden h-7 w-7 items-center justify-center rounded-full border border-border bg-background text-foreground shadow-[0_10px_22px_rgba(0,0,0,0.12)] transition hover:border-ring/45 hover:bg-muted dark:shadow-[0_10px_22px_rgba(0,0,0,0.35)] lg:inline-flex"
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
@@ -50,14 +50,16 @@ export function DashboardSidebar({
 
       <div
         className={cn(
-          'rounded-2xl border border-white/14 bg-white/5 transition-all duration-300',
+          'rounded-2xl border border-border bg-background/60 transition-all duration-300',
           isCollapsed ? 'px-2 py-3 text-center' : 'px-4 py-3'
         )}
       >
-        <p className="text-xs uppercase tracking-[0.16em] text-white/55">
+        <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
           {isCollapsed ? 'EF' : 'EventForge'}
         </p>
-        {!isCollapsed ? <p className="mt-1 text-sm font-semibold text-white">{title}</p> : null}
+        {!isCollapsed ? (
+          <p className="mt-1 text-sm font-semibold text-foreground">{title}</p>
+        ) : null}
       </div>
 
       <nav className="mt-5 space-y-2">
@@ -74,8 +76,8 @@ export function DashboardSidebar({
                 'flex items-center rounded-xl border text-sm transition',
                 isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5',
                 isActive
-                  ? 'border-[#00A896]/45 bg-[#00A896]/16 text-[#b5fff7]'
-                  : 'border-transparent text-white/75 hover:border-white/18 hover:bg-white/8 hover:text-white'
+                  ? 'border-primary/45 bg-primary/15 text-primary'
+                  : 'border-transparent text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground'
               )}
             >
               <item.icon className="h-4 w-4" />
@@ -89,7 +91,7 @@ export function DashboardSidebar({
         <button
           onClick={onSignOut}
           title={isCollapsed ? 'Sign Out' : undefined}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2.5 text-sm font-semibold text-white/92 transition hover:border-white/35 hover:bg-white/16"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background/75 px-3 py-2.5 text-sm font-semibold text-foreground transition hover:border-ring/45 hover:bg-muted"
         >
           <LogOut className="h-4 w-4" />
           {!isCollapsed ? <span>Sign Out</span> : null}

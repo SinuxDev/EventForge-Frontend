@@ -152,10 +152,10 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-white/12 bg-[#11141d] p-6 text-white shadow-[0_24px_70px_rgba(0,0,0,0.58)] sm:min-h-160 sm:p-7">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-foreground shadow-[0_24px_70px_rgba(0,0,0,0.32)] sm:min-h-160 sm:p-7 dark:shadow-[0_24px_70px_rgba(0,0,0,0.58)]">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] text-white/60">EventForge</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">EventForge</p>
             <h2 className="mt-2 text-2xl font-semibold">
               {mode === 'signin' ? 'Sign in to continue' : 'Create your account'}
             </h2>
@@ -163,17 +163,19 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-white/15 p-2 text-white/70 transition hover:text-white"
+            className="rounded-full border border-border p-2 text-muted-foreground transition hover:border-ring/40 hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-white/5 p-1">
+        <div className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-muted/60 p-1">
           <button
             type="button"
             className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-              mode === 'signin' ? 'bg-white text-[#10121a]' : 'text-white/70 hover:text-white'
+              mode === 'signin'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
             onClick={() => switchMode('signin')}
           >
@@ -182,7 +184,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <button
             type="button"
             className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-              mode === 'signup' ? 'bg-white text-[#10121a]' : 'text-white/70 hover:text-white'
+              mode === 'signup'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
             onClick={() => switchMode('signup')}
           >
@@ -191,9 +195,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </div>
 
         <div className="my-5 flex items-center gap-3">
-          <span className="h-px flex-1 bg-white/12" />
-          <span className="text-xs text-white/50">with email</span>
-          <span className="h-px flex-1 bg-white/12" />
+          <span className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground">with email</span>
+          <span className="h-px flex-1 bg-border" />
         </div>
 
         {mode === 'signin' ? (
@@ -201,28 +205,30 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <input
               type="email"
               placeholder="Email"
-              className="w-full rounded-xl border border-white/15 bg-black/30 px-3.5 py-3 text-sm outline-none transition focus:border-[#00A896]"
+              className="w-full rounded-xl border border-input bg-background px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
               {...signInForm.register('email')}
             />
             {signInForm.formState.errors.email ? (
-              <p className="text-xs text-[#ff9ac9]">{signInForm.formState.errors.email.message}</p>
+              <p className="text-xs text-destructive">
+                {signInForm.formState.errors.email.message}
+              </p>
             ) : null}
 
             <input
               type="password"
               placeholder="Password"
-              className="w-full rounded-xl border border-white/15 bg-black/30 px-3.5 py-3 text-sm outline-none transition focus:border-[#00A896]"
+              className="w-full rounded-xl border border-input bg-background px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
               {...signInForm.register('password')}
             />
             {signInForm.formState.errors.password ? (
-              <p className="text-xs text-[#ff9ac9]">
+              <p className="text-xs text-destructive">
                 {signInForm.formState.errors.password.message}
               </p>
             ) : null}
 
             <Button
               type="submit"
-              className="mt-2 h-11 w-full bg-[#FF69B4] text-white shadow-[0_10px_24px_rgba(255,105,180,0.34)] hover:-translate-y-0.5 hover:bg-[#ff5ba9]"
+              className="mt-2 h-11 w-full bg-primary text-primary-foreground shadow-[0_10px_24px_rgba(0,168,150,0.28)] hover:-translate-y-0.5 hover:bg-primary/90"
               disabled={isActionPending}
             >
               {isSignInPending ? 'Signing in...' : 'Sign In'}
@@ -233,31 +239,33 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <input
               type="text"
               placeholder="Full name"
-              className="w-full rounded-xl border border-white/15 bg-black/30 px-3.5 py-3 text-sm outline-none transition focus:border-[#00A896]"
+              className="w-full rounded-xl border border-input bg-background px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
               {...signUpForm.register('name')}
             />
             {signUpForm.formState.errors.name ? (
-              <p className="text-xs text-[#ff9ac9]">{signUpForm.formState.errors.name.message}</p>
+              <p className="text-xs text-destructive">{signUpForm.formState.errors.name.message}</p>
             ) : null}
 
             <input
               type="email"
               placeholder="Email"
-              className="w-full rounded-xl border border-white/15 bg-black/30 px-3.5 py-3 text-sm outline-none transition focus:border-[#00A896]"
+              className="w-full rounded-xl border border-input bg-background px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
               {...signUpForm.register('email')}
             />
             {signUpForm.formState.errors.email ? (
-              <p className="text-xs text-[#ff9ac9]">{signUpForm.formState.errors.email.message}</p>
+              <p className="text-xs text-destructive">
+                {signUpForm.formState.errors.email.message}
+              </p>
             ) : null}
 
             <input
               type="password"
               placeholder="Password"
-              className="w-full rounded-xl border border-white/15 bg-black/30 px-3.5 py-3 text-sm outline-none transition focus:border-[#00A896]"
+              className="w-full rounded-xl border border-input bg-background px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
               {...signUpForm.register('password')}
             />
             {signUpForm.formState.errors.password ? (
-              <p className="text-xs text-[#ff9ac9]">
+              <p className="text-xs text-destructive">
                 {signUpForm.formState.errors.password.message}
               </p>
             ) : null}
@@ -265,18 +273,18 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <input
               type="password"
               placeholder="Confirm password"
-              className="w-full rounded-xl border border-white/15 bg-black/30 px-3.5 py-3 text-sm outline-none transition focus:border-[#00A896]"
+              className="w-full rounded-xl border border-input bg-background px-3.5 py-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring"
               {...signUpForm.register('confirmPassword')}
             />
             {signUpForm.formState.errors.confirmPassword ? (
-              <p className="text-xs text-[#ff9ac9]">
+              <p className="text-xs text-destructive">
                 {signUpForm.formState.errors.confirmPassword.message}
               </p>
             ) : null}
 
             <Button
               type="submit"
-              className="mt-2 h-11 w-full bg-[#FF69B4] text-white shadow-[0_10px_24px_rgba(255,105,180,0.34)] hover:-translate-y-0.5 hover:bg-[#ff5ba9]"
+              className="mt-2 h-11 w-full bg-primary text-primary-foreground shadow-[0_10px_24px_rgba(0,168,150,0.28)] hover:-translate-y-0.5 hover:bg-primary/90"
               disabled={isActionPending}
             >
               {isSignUpPending ? 'Creating account...' : 'Create Account'}
@@ -285,16 +293,16 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         )}
 
         <div className="my-6 flex items-center gap-3">
-          <span className="h-px flex-1 bg-white/12" />
-          <span className="text-xs text-white/50">or continue with</span>
-          <span className="h-px flex-1 bg-white/12" />
+          <span className="h-px flex-1 bg-border" />
+          <span className="text-xs text-muted-foreground">or continue with</span>
+          <span className="h-px flex-1 bg-border" />
         </div>
 
         <div className="grid gap-2">
           <Button
             type="button"
             variant="outline"
-            className="h-11 w-full cursor-pointer justify-start gap-2.5 border-white/20 bg-white/5 px-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] hover:-translate-y-0.5 hover:bg-white/10 hover:text-white"
+            className="h-11 w-full cursor-pointer justify-start gap-2.5 border-border bg-background px-4 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] hover:-translate-y-0.5 hover:border-ring/35 hover:bg-muted hover:text-foreground"
             onClick={() => handleSocialSignIn('google')}
             disabled={isActionPending}
           >
@@ -306,7 +314,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <Button
             type="button"
             variant="outline"
-            className="h-11 w-full cursor-pointer justify-start gap-2.5 border-white/20 bg-white/5 px-4 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] hover:-translate-y-0.5 hover:bg-white/10 hover:text-white"
+            className="h-11 w-full cursor-pointer justify-start gap-2.5 border-border bg-background px-4 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] hover:-translate-y-0.5 hover:border-ring/35 hover:bg-muted hover:text-foreground"
             onClick={() => handleSocialSignIn('github')}
             disabled={isActionPending}
           >
@@ -317,7 +325,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </Button>
         </div>
 
-        {errorMessage ? <p className="mt-3 text-xs text-[#ff9ac9]">{errorMessage}</p> : null}
+        {errorMessage ? <p className="mt-3 text-xs text-destructive">{errorMessage}</p> : null}
       </div>
     </div>
   );

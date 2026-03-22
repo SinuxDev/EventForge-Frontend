@@ -23,8 +23,8 @@ export default function DashboardGatewayPage() {
   }, [router, session?.user?.role, status]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#0b0d13] px-6 text-white">
-      <p className="text-sm text-white/70">Preparing your dashboard...</p>
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
+      <p className="text-sm text-muted-foreground">Preparing your dashboard...</p>
     </main>
   );
 }

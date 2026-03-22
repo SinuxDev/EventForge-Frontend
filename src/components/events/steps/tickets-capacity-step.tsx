@@ -73,50 +73,50 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
     <>
       <div className="grid gap-4 md:grid-cols-3">
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Capacity</span>
+          <span className="text-sm text-muted-foreground">Capacity</span>
           <input
             type="number"
             {...form.register('capacity', {
               onChange: validateTicketCapacity,
             })}
-            className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm outline-none"
+            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none focus:border-ring"
           />
-          <p className="text-xs text-[#ff9ec9]">{form.formState.errors.capacity?.message}</p>
+          <p className="text-xs text-destructive">{form.formState.errors.capacity?.message}</p>
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Registration opens</span>
+          <span className="text-sm text-muted-foreground">Registration opens</span>
           <input
             type="datetime-local"
             {...form.register('registrationOpenAt', {
               onChange: validateRegistrationDates,
             })}
-            className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm outline-none"
+            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none focus:border-ring"
             max={eventStartDateTime || undefined}
           />
-          <p className="text-xs text-[#ff9ec9]">
+          <p className="text-xs text-destructive">
             {form.formState.errors.registrationOpenAt?.message}
           </p>
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Registration closes</span>
+          <span className="text-sm text-muted-foreground">Registration closes</span>
           <input
             type="datetime-local"
             {...form.register('registrationCloseAt', {
               onChange: validateRegistrationDates,
             })}
-            className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm outline-none"
+            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none focus:border-ring"
             max={eventStartDateTime || undefined}
           />
-          <p className="text-xs text-[#ff9ec9]">
+          <p className="text-xs text-destructive">
             {form.formState.errors.registrationCloseAt?.message}
           </p>
         </label>
       </div>
 
       {form.formState.errors.registrationOpenAt || form.formState.errors.registrationCloseAt ? (
-        <p className="rounded-xl border border-[#ff69b4]/35 bg-[#ff69b4]/12 px-3 py-2 text-xs text-[#ffb3d8]">
+        <p className="rounded-xl border border-destructive/35 bg-destructive/10 px-3 py-2 text-xs text-destructive">
           Registration open and close must be before the event start time.
         </p>
       ) : null}
@@ -124,8 +124,8 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-white/85">Ticket types</h3>
-            <p className="mt-1 text-xs text-white/55">
+            <h3 className="text-sm font-semibold text-foreground">Ticket types</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
               Capacity: {capacity || 0} • Assigned: {totalTicketQuantity} • Remaining:{' '}
               {remainingSeats}
             </p>
@@ -133,7 +133,7 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
           <Button
             type="button"
             variant="secondary"
-            className="h-10 border-[#00A896]/45 bg-[#00A896]/18 px-4 text-[#b8fff8] hover:border-[#00A896]/65 hover:bg-[#00A896]/25"
+            className="h-10 border-primary/45 bg-primary/16 px-4 text-primary hover:border-primary/65 hover:bg-primary/24"
             disabled={!canAddTicket}
             onClick={() =>
               ticketsFieldArray.append({
@@ -148,9 +148,9 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
         </div>
 
         {ticketsFieldArray.fields.map((field, index) => (
-          <div key={field.id} className="rounded-xl border border-white/12 bg-white/4 p-3">
+          <div key={field.id} className="rounded-xl border border-border bg-card/65 p-3">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <div className="inline-flex rounded-lg border border-white/14 bg-black/20 p-1">
+              <div className="inline-flex rounded-lg border border-border bg-muted/55 p-1">
                 {(['free', 'paid'] as const).map((typeOption) => {
                   const isSelected = (form.watch(`tickets.${index}.type`) ?? 'free') === typeOption;
 
@@ -161,8 +161,8 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
                       onClick={() => handleTicketTypeChange(index, typeOption)}
                       className={`rounded-md px-3 py-1.5 text-xs font-semibold capitalize transition ${
                         isSelected
-                          ? 'bg-[#00A896]/20 text-[#b8fff8]'
-                          : 'text-white/65 hover:text-white/85'
+                          ? 'bg-primary/18 text-primary'
+                          : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       {typeOption}
@@ -174,7 +174,7 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
               <button
                 type="button"
                 onClick={() => ticketsFieldArray.remove(index)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/20 bg-white/8 text-white/75 hover:text-white"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background/75 text-muted-foreground transition hover:border-ring/40 hover:text-foreground"
                 title="Remove ticket"
               >
                 <Trash2 className="h-4 w-4" />
@@ -184,7 +184,7 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
             <div className="grid gap-3 md:grid-cols-4">
               <input
                 {...form.register(`tickets.${index}.name`)}
-                className="h-10 rounded-lg border border-white/15 bg-black/25 px-3 text-sm"
+                className="h-10 rounded-lg border border-input bg-background/85 px-3 text-sm text-foreground"
                 placeholder="Ticket name"
               />
 
@@ -194,7 +194,7 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
                 {...form.register(`tickets.${index}.quantity`, {
                   onChange: validateTicketCapacity,
                 })}
-                className="h-10 rounded-lg border border-white/15 bg-black/25 px-3 text-sm"
+                className="h-10 rounded-lg border border-input bg-background/85 px-3 text-sm text-foreground"
                 placeholder="Qty"
               />
 
@@ -207,11 +207,11 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
                       void form.trigger(`tickets.${index}.price`);
                     },
                   })}
-                  className="h-10 rounded-lg border border-white/15 bg-black/25 px-3 text-sm"
+                  className="h-10 rounded-lg border border-input bg-background/85 px-3 text-sm text-foreground"
                   placeholder="Price"
                 />
               ) : (
-                <div className="inline-flex h-10 items-center rounded-lg border border-[#00A896]/30 bg-[#00A896]/10 px-3 text-sm text-[#b8fff8]">
+                <div className="inline-flex h-10 items-center rounded-lg border border-primary/35 bg-primary/10 px-3 text-sm text-primary">
                   Free ticket
                 </div>
               )}
@@ -238,17 +238,17 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
                   </SelectContent>
                 </Select>
               ) : (
-                <div className="inline-flex h-10 items-center rounded-lg border border-white/12 bg-white/6 px-3 text-sm text-white/55">
+                <div className="inline-flex h-10 items-center rounded-lg border border-border bg-muted/40 px-3 text-sm text-muted-foreground">
                   Currency not required
                 </div>
               )}
             </div>
 
             <div className="mt-2 grid gap-2 md:grid-cols-2">
-              <p className="text-xs text-[#ff9ec9]">
+              <p className="text-xs text-destructive">
                 {form.formState.errors.tickets?.[index]?.quantity?.message as string | undefined}
               </p>
-              <p className="text-xs text-[#ff9ec9]">
+              <p className="text-xs text-destructive">
                 {(form.formState.errors.tickets?.[index]?.price?.message as string | undefined) ??
                   (form.formState.errors.tickets?.[index]?.currency?.message as string | undefined)}
               </p>
@@ -256,7 +256,7 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
           </div>
         ))}
 
-        <p className="text-xs text-[#ff9ec9]">
+        <p className="text-xs text-destructive">
           {form.formState.errors.tickets?.message as string | undefined}
         </p>
       </div>

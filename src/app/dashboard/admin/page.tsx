@@ -178,26 +178,28 @@ export default function AdminDashboardPage() {
     <DashboardShell requiredRole="admin">
       <PublishSuccessToast />
       <section className="w-full space-y-5">
-        <section className="rounded-2xl border border-white/12 bg-white/6 p-6 backdrop-blur">
-          <p className="text-xs uppercase tracking-[0.16em] text-white/55">Admin dashboard</p>
+        <section className="rounded-2xl border border-border bg-card/80 p-6 backdrop-blur">
+          <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+            Admin dashboard
+          </p>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
             <h1 className="text-2xl font-bold md:text-3xl">User governance</h1>
-            <span className="rounded-full border border-[#00A896]/35 bg-[#00A896]/12 px-3 py-1 text-xs font-medium text-[#9ef0e6]">
+            <span className="rounded-full border border-primary/35 bg-primary/12 px-3 py-1 text-xs font-medium text-primary">
               Least privilege enforced
             </span>
           </div>
-          <p className="mt-3 text-sm text-white/70">
+          <p className="mt-3 text-sm text-muted-foreground">
             Manage user roles and account status with centralized controls.
           </p>
         </section>
 
-        <section className="rounded-2xl border border-white/12 bg-white/6 p-4 backdrop-blur md:p-5">
+        <section className="rounded-2xl border border-border bg-card/80 p-4 backdrop-blur md:p-5">
           <div className="grid gap-3 md:grid-cols-4">
             <input
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
               placeholder="Search name or email"
-              className="h-11 rounded-xl border border-white/15 bg-black/30 px-3.5 text-sm outline-none transition focus:border-[#00A896]"
+              className="h-11 rounded-xl border border-input bg-background px-3.5 text-sm text-foreground outline-none transition focus:border-ring"
             />
 
             <Select
@@ -231,15 +233,15 @@ export default function AdminDashboardPage() {
 
             <button
               onClick={fetchUsers}
-              className="h-11 rounded-xl border border-white/20 bg-white/10 px-4 text-sm font-semibold text-white/90 transition hover:border-white/35 hover:bg-white/16"
+              className="h-11 rounded-xl border border-border bg-background/80 px-4 text-sm font-semibold text-foreground transition hover:border-ring/35 hover:bg-muted"
             >
               Apply filters
             </button>
           </div>
 
-          <div className="mt-4 overflow-x-auto rounded-xl border border-white/12 bg-[#10141f]/70">
+          <div className="mt-4 overflow-x-auto rounded-xl border border-border bg-card/70">
             <table className="w-full min-w-195 border-collapse">
-              <thead className="bg-white/4 text-left text-xs uppercase tracking-[0.12em] text-white/52">
+              <thead className="bg-muted/45 text-left text-xs uppercase tracking-[0.12em] text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3">User</th>
                   <th className="px-4 py-3">Role</th>
@@ -251,22 +253,22 @@ export default function AdminDashboardPage() {
               <tbody>
                 {isLoadingUsers ? (
                   <tr>
-                    <td className="px-4 py-6 text-sm text-white/70" colSpan={5}>
+                    <td className="px-4 py-6 text-sm text-muted-foreground" colSpan={5}>
                       Loading users...
                     </td>
                   </tr>
                 ) : users.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-6 text-sm text-white/70" colSpan={5}>
+                    <td className="px-4 py-6 text-sm text-muted-foreground" colSpan={5}>
                       No users found for the selected filters.
                     </td>
                   </tr>
                 ) : (
                   users.map((user) => (
-                    <tr key={user._id} className="border-t border-white/8 text-sm text-white/85">
+                    <tr key={user._id} className="border-t border-border text-sm text-foreground">
                       <td className="px-4 py-3.5">
-                        <p className="font-medium text-white">{user.name}</p>
-                        <p className="text-xs text-white/55">{user.email}</p>
+                        <p className="font-medium text-foreground">{user.name}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
                       </td>
                       <td className="px-4 py-3.5">
                         <Select
@@ -283,13 +285,13 @@ export default function AdminDashboardPage() {
                           </SelectContent>
                         </Select>
                       </td>
-                      <td className="px-4 py-3.5 text-white/70">{user.provider}</td>
+                      <td className="px-4 py-3.5 text-muted-foreground">{user.provider}</td>
                       <td className="px-4 py-3.5">
                         <span
                           className={`rounded-full px-2.5 py-1 text-xs font-medium ${
                             user.isSuspended
-                              ? 'border border-[#ff69b4]/35 bg-[#ff69b4]/12 text-[#ffb5d8]'
-                              : 'border border-[#00A896]/35 bg-[#00A896]/12 text-[#9ef0e6]'
+                              ? 'border border-destructive/35 bg-destructive/10 text-destructive'
+                              : 'border border-primary/35 bg-primary/10 text-primary'
                           }`}
                         >
                           {user.isSuspended ? 'suspended' : 'active'}
@@ -298,7 +300,7 @@ export default function AdminDashboardPage() {
                       <td className="px-4 py-3.5">
                         <button
                           onClick={() => handleSuspensionToggle(user)}
-                          className="rounded-lg border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 transition hover:border-white/32 hover:bg-white/16"
+                          className="rounded-lg border border-border bg-background/80 px-3 py-1.5 text-xs font-semibold text-foreground transition hover:border-ring/35 hover:bg-muted"
                         >
                           {user.isSuspended ? 'Unsuspend' : 'Suspend'}
                         </button>

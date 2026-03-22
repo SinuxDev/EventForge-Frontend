@@ -18,7 +18,7 @@ export function PublishStep() {
     <>
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Visibility</span>
+          <span className="text-sm text-muted-foreground">Visibility</span>
           <Select
             value={form.watch('visibility')}
             onValueChange={(value) => {
@@ -42,16 +42,16 @@ export function PublishStep() {
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm text-white/70">Organizer website (optional)</span>
+          <span className="text-sm text-muted-foreground">Organizer website (optional)</span>
           <input
             {...form.register('organizerUrl')}
-            className="h-11 w-full rounded-xl border border-white/15 bg-black/25 px-3.5 text-sm"
+            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none focus:border-ring"
             placeholder="https://your-brand.com"
           />
         </label>
       </div>
 
-      <p className="rounded-xl border border-[#00A896]/30 bg-[#00A896]/10 px-4 py-3 text-sm text-[#a7fff5]">
+      <p className="rounded-xl border border-primary/35 bg-primary/10 px-4 py-3 text-sm text-primary">
         Publishing checklist: valid date/time, location completeness, and at least one ticket.
       </p>
     </>

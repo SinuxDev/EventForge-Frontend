@@ -13,6 +13,7 @@ import { ScheduleLocationStep } from '@/components/events/steps/schedule-locatio
 import { StepPills } from '@/components/events/steps/step-pills';
 import { TicketsCapacityStep } from '@/components/events/steps/tickets-capacity-step';
 import {
+  ATTENDANCE_MODE_LABEL_MAP,
   STEP_FIELD_MAP,
   STEP_TITLES,
   getFirstInvalidStep,
@@ -361,6 +362,7 @@ export function OrganizerEventForm() {
       }
 
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-events'] });
     },
   });
 
@@ -387,6 +389,7 @@ export function OrganizerEventForm() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['organizer-events'] });
     },
   });
 
@@ -417,12 +420,16 @@ export function OrganizerEventForm() {
       const payload = buildPayload(parsedValues);
 
       await saveDraftMutation.mutateAsync(payload);
+
+      if (isPublishedEvent) {
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        queryClient.invalidateQueries({ queryKey: ['organizer-events'] });
+        router.replace('/dashboard/organizer?updated=1');
+        return;
+      }
+
       toast({
-        title: isPublishedEvent
-          ? 'Published event updated'
-          : currentDraftId
-            ? 'Draft updated'
-            : 'Draft saved',
+        title: currentDraftId ? 'Draft updated' : 'Draft saved',
       });
     } catch (error) {
       const conflictMessage = extractConflictMessage(error);
@@ -506,29 +513,29 @@ export function OrganizerEventForm() {
 
   return (
     <section className="grid gap-6 xl:grid-cols-[1.4fr_0.6fr]">
-      <div className="rounded-2xl border border-white/12 bg-white/6 p-5 backdrop-blur md:p-6">
+      <div className="rounded-2xl border border-border bg-card/80 p-5 backdrop-blur md:p-6">
         {draftBootstrapQuery.isLoading ? (
-          <div className="mb-4 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60">
+          <div className="mb-4 rounded-xl border border-border bg-muted/45 px-3 py-2 text-xs text-muted-foreground">
             Loading your latest draft...
           </div>
         ) : null}
 
-        <div className="mb-5 rounded-xl border border-white/12 bg-white/4 px-4 py-3">
-          <p className="text-xs uppercase tracking-[0.14em] text-white/55">
+        <div className="mb-5 rounded-xl border border-border bg-muted/35 px-4 py-3">
+          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
             Organizer / Events / Create
           </p>
-          <p className="mt-1 text-sm text-white/70">
+          <p className="mt-1 text-sm text-muted-foreground">
             Build a single-date event with ticketing, attendee questions, and publish controls.
           </p>
 
           {isPublishedEvent ? (
-            <p className="mt-2 text-xs text-[#9ef0e6]">
+            <p className="mt-2 text-xs text-primary">
               Editing a published event: date/time changes are allowed only forward.
             </p>
           ) : null}
 
           {isFinishedEvent ? (
-            <p className="mt-2 text-xs text-[#ffc2df]">
+            <p className="mt-2 text-xs text-destructive">
               This event has finished. Editing is disabled.
             </p>
           ) : null}
@@ -536,11 +543,13 @@ export function OrganizerEventForm() {
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.16em] text-white/55">Event creation</p>
-            <h1 className="mt-2 text-2xl font-bold">Organizer Event Panel</h1>
+            <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              Event creation
+            </p>
+            <h1 className="mt-2 text-2xl font-bold text-foreground">Organizer Event Panel</h1>
           </div>
 
-          <span className="rounded-full border border-white/20 bg-white/8 px-3 py-1 text-xs text-white/75">
+          <span className="rounded-full border border-border bg-background/70 px-3 py-1 text-xs text-muted-foreground">
             Single-date flow
           </span>
         </div>
@@ -556,12 +565,12 @@ export function OrganizerEventForm() {
           <form className="mt-6 space-y-5">{renderCurrentStep()}</form>
         </FormProvider>
 
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-white/12 pt-4">
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
           <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="outline"
-              className="h-10 border-white/25 bg-white/10 px-4 text-white/90 hover:border-white/40 hover:bg-white/16 disabled:border-white/12 disabled:bg-white/6 disabled:text-white/35"
+              className="h-10 border-border bg-background/80 px-4 text-foreground hover:border-ring/40 hover:bg-muted disabled:border-border disabled:bg-muted/30 disabled:text-muted-foreground"
               onClick={() => setStep((current) => Math.max(0, current - 1))}
               disabled={step === 0}
             >
@@ -570,7 +579,7 @@ export function OrganizerEventForm() {
             <Button
               type="button"
               variant="outline"
-              className="h-10 border-[#00A896]/45 bg-[#00A896]/18 px-4 text-[#b8fff8] hover:border-[#00A896]/65 hover:bg-[#00A896]/25 disabled:border-white/12 disabled:bg-white/6 disabled:text-white/35"
+              className="h-10 border-primary/45 bg-primary/16 px-4 text-primary hover:border-primary/65 hover:bg-primary/24 disabled:border-border disabled:bg-muted/30 disabled:text-muted-foreground"
               onClick={async () => {
                 const fieldsToValidate = STEP_FIELD_MAP[step] as Array<keyof EventCreateFormValues>;
                 const isStepValid = await form.trigger(fieldsToValidate, {
@@ -587,7 +596,7 @@ export function OrganizerEventForm() {
             >
               Next
             </Button>
-            <span className="ml-1 text-xs text-white/55">
+            <span className="ml-1 text-xs text-muted-foreground">
               Step {step + 1} of {STEP_TITLES.length}
             </span>
           </div>
@@ -618,42 +627,44 @@ export function OrganizerEventForm() {
         </div>
       </div>
 
-      <aside className="rounded-2xl border border-white/12 bg-white/6 p-5 backdrop-blur md:p-6">
-        <p className="text-xs uppercase tracking-[0.16em] text-white/55">Live preview</p>
+      <aside className="rounded-2xl border border-border bg-card/80 p-5 backdrop-blur md:p-6">
+        <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">Live preview</p>
         <h2 className="mt-2 text-xl font-semibold">{watchedValues.title || 'Untitled event'}</h2>
-        <p className="mt-3 text-sm text-white/70">
+        <p className="mt-3 text-sm text-muted-foreground">
           {watchedValues.shortSummary ||
             'Add a concise summary so attendees understand your event quickly.'}
         </p>
 
         <dl className="mt-5 space-y-3 text-sm">
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-white/60">Category</dt>
-            <dd className="font-medium text-white">
+            <dt className="text-muted-foreground">Category</dt>
+            <dd className="font-medium text-foreground">
               {watchedValues.category === 'other'
                 ? watchedValues.customCategory || 'other'
                 : watchedValues.category || '-'}
             </dd>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-white/60">Mode</dt>
-            <dd className="font-medium text-white">
-              {String(watchedValues.attendanceMode ?? '-')}
+            <dt className="text-muted-foreground">Mode</dt>
+            <dd className="font-medium text-foreground">
+              {watchedValues.attendanceMode
+                ? ATTENDANCE_MODE_LABEL_MAP[watchedValues.attendanceMode]
+                : '-'}
             </dd>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-white/60">Capacity</dt>
-            <dd className="font-medium text-white">{String(watchedValues.capacity ?? '-')}</dd>
+            <dt className="text-muted-foreground">Capacity</dt>
+            <dd className="font-medium text-foreground">{String(watchedValues.capacity ?? '-')}</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-white/60">Tickets</dt>
-            <dd className="font-medium text-white">
+            <dt className="text-muted-foreground">Tickets</dt>
+            <dd className="font-medium text-foreground">
               {Array.isArray(watchedValues.tickets) ? watchedValues.tickets.length : 0}
             </dd>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-white/60">Draft ID</dt>
-            <dd className="truncate font-medium text-white">{eventId ?? 'Not saved yet'}</dd>
+            <dt className="text-muted-foreground">Draft ID</dt>
+            <dd className="truncate font-medium text-foreground">{eventId ?? 'Not saved yet'}</dd>
           </div>
         </dl>
       </aside>

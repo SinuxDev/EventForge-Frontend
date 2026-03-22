@@ -4,7 +4,7 @@ import {
   type EventCreateFormValues,
   type EventCreateInput,
 } from '@/lib/schemas/event-create.schema';
-import type { EventQuestionType, EventVisibility } from '@/types/event';
+import type { EventAttendanceMode, EventQuestionType, EventVisibility } from '@/types/event';
 
 export const STEP_TITLES = [
   'Basics',
@@ -55,6 +55,12 @@ export const CATEGORY_LABEL_MAP: Record<(typeof EVENT_CATEGORY_OPTIONS)[number],
   exhibition: 'Exhibition',
   charity: 'Charity',
   other: 'Other',
+};
+
+export const ATTENDANCE_MODE_LABEL_MAP: Record<EventAttendanceMode, string> = {
+  in_person: 'In person',
+  online: 'Online',
+  hybrid: 'Hybrid',
 };
 
 export const STEP_FIELD_MAP: Array<

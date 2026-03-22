@@ -11,16 +11,20 @@ export function PublishSuccessToast() {
 
   useEffect(() => {
     const publishedFlag = searchParams.get('published');
+    const updatedFlag = searchParams.get('updated');
 
-    if (publishedFlag !== '1' || hasShownRef.current) {
+    if ((publishedFlag !== '1' && updatedFlag !== '1') || hasShownRef.current) {
       return;
     }
 
     hasShownRef.current = true;
-    toast({ title: 'Event published successfully' });
+    toast({
+      title: publishedFlag === '1' ? 'Event published successfully' : 'Event updated successfully',
+    });
 
     const params = new URLSearchParams(searchParams.toString());
     params.delete('published');
+    params.delete('updated');
     const queryString = params.toString();
     const pathname = typeof window !== 'undefined' ? window.location.pathname : '/dashboard';
 

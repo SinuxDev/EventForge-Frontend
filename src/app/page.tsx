@@ -4,6 +4,7 @@ import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AuthModal } from '@/components/shared/auth-modal';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { toast } from '@/hooks/use-toast';
 import { getPostLoginRoute } from '@/lib/auth-redirect';
 
@@ -64,29 +65,29 @@ function AnvilLogo() {
 function HeroVisual() {
   return (
     <div className="relative mx-auto w-full max-w-130">
-      <div className="absolute inset-0 -z-10 rounded-full bg-radial from-[#FF69B4]/30 via-[#6A1B9A]/18 to-transparent blur-2xl" />
-      <div className="relative overflow-hidden rounded-full border border-white/10 bg-[#0f1118] p-8 shadow-[0_28px_80px_rgba(0,0,0,0.55)]">
-        <div className="mx-auto max-w-82.5 rounded-[2.2rem] border border-white/10 bg-[#171a24] p-3 shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
-          <div className="rounded-[1.8rem] bg-linear-to-b from-[#261b3b] via-[#191a2c] to-[#12131c] p-4">
+      <div className="absolute inset-0 -z-10 rounded-full bg-radial from-accent/28 via-primary/14 to-transparent blur-2xl" />
+      <div className="relative overflow-hidden rounded-full border border-border bg-card p-8 shadow-[0_28px_80px_rgba(0,0,0,0.2)] dark:shadow-[0_28px_80px_rgba(0,0,0,0.55)]">
+        <div className="mx-auto max-w-82.5 rounded-[2.2rem] border border-border bg-background p-3 shadow-[0_12px_40px_rgba(0,0,0,0.18)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
+          <div className="rounded-[1.8rem] bg-linear-to-b from-primary/25 via-background to-muted p-4">
             <div className="mb-4 h-28 rounded-2xl bg-linear-to-br from-[#ff69b4]/55 via-[#6a1b9a]/50 to-[#2196f3]/40" />
             <div className="space-y-2">
-              <p className="font-semibold text-white">Global Product Summit</p>
-              <p className="text-xs text-white/70">Thu, Oct 10 · 9:00 AM · New York</p>
+              <p className="font-semibold text-foreground">Global Product Summit</p>
+              <p className="text-xs text-muted-foreground">Thu, Oct 10 · 9:00 AM · New York</p>
             </div>
-            <div className="mt-4 flex items-center justify-between rounded-xl border border-white/12 bg-white/8 px-3 py-2">
-              <span className="text-[11px] text-white/75">Live RSVP feed</span>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[#9ef0e6]">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00A896]" />
+            <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-card/85 px-3 py-2">
+              <span className="text-[11px] text-muted-foreground">Live RSVP feed</span>
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-primary">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
                 +42 in last hour
               </span>
             </div>
           </div>
         </div>
 
-        <div className="absolute left-6 top-14 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+        <div className="absolute left-6 top-14 rounded-full border border-border bg-background/85 px-3 py-1 text-xs font-medium text-foreground backdrop-blur">
           92K RSVPs this month
         </div>
-        <div className="absolute bottom-12 right-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+        <div className="absolute bottom-12 right-4 rounded-full border border-border bg-background/85 px-3 py-1 text-xs font-medium text-foreground backdrop-blur">
           Multi-venue ready
         </div>
       </div>
@@ -158,44 +159,51 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0b0d13] text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-0 top-0 h-full w-full bg-[radial-gradient(circle_at_20%_20%,rgba(33,150,243,0.2),transparent_42%),radial-gradient(circle_at_75%_24%,rgba(255,105,180,0.16),transparent_45%),radial-gradient(circle_at_52%_80%,rgba(0,168,150,0.14),transparent_40%)]" />
-        <div className="absolute inset-0 bg-linear-to-b from-white/6 via-transparent to-[#0b0d13]" />
+        <div className="absolute left-0 top-0 h-full w-full bg-[radial-gradient(circle_at_20%_20%,rgba(33,150,243,0.1),transparent_42%),radial-gradient(circle_at_75%_24%,rgba(255,105,180,0.08),transparent_45%),radial-gradient(circle_at_52%_80%,rgba(0,168,150,0.08),transparent_40%)] dark:bg-[radial-gradient(circle_at_20%_20%,rgba(33,150,243,0.2),transparent_42%),radial-gradient(circle_at_75%_24%,rgba(255,105,180,0.16),transparent_45%),radial-gradient(circle_at_52%_80%,rgba(0,168,150,0.14),transparent_40%)]" />
+        <div className="absolute inset-0 bg-linear-to-b from-white/35 via-transparent to-background dark:from-white/6" />
       </div>
 
       <header
         className={`sticky top-0 z-20 transition-all duration-300 ${
-          isScrolled
-            ? 'bg-[#0b0d13]/88 shadow-[0_1px_0_rgba(18,20,30,0.85)] backdrop-blur-xl'
-            : 'bg-[#0b0d13]/35 backdrop-blur-md'
+          isScrolled ? 'bg-background/84 backdrop-blur-xl' : 'bg-background/55 backdrop-blur-md'
         }`}
       >
         <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4 md:px-6">
           <a
             href="#"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-white/90"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-foreground"
           >
             <AnvilLogo />
             <span>EventForge</span>
           </a>
 
-          <div className="flex items-center gap-3 text-xs text-white/65 sm:gap-6 sm:text-sm">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground sm:gap-4 sm:text-sm">
             <span className="hidden sm:inline">{timezoneLabel}</span>
-            <a href="#" className="hidden transition hover:text-white sm:inline">
+            <a href="#" className="hidden transition hover:text-foreground sm:inline">
               Explore Events ↗
             </a>
-            {isAuthenticated ? (
+            <ThemeToggle />
+            {status === 'loading' ? (
+              <button
+                className="relative cursor-default overflow-hidden rounded-full border border-border bg-card/80 px-4 py-2 font-medium text-foreground/70 shadow-[0_4px_18px_rgba(0,0,0,0.16)]"
+                aria-hidden="true"
+                tabIndex={-1}
+              >
+                Loading...
+              </button>
+            ) : isAuthenticated ? (
               <button
                 onClick={handleSignOut}
-                className="relative cursor-pointer overflow-hidden rounded-full border border-white/15 bg-white/10 px-4 py-2 font-medium text-white shadow-[0_4px_18px_rgba(0,0,0,0.28)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-8 before:rotate-12 before:bg-white/30 before:opacity-0 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/18 hover:shadow-[0_10px_28px_rgba(255,255,255,0.16)] hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 active:translate-y-0 active:scale-[0.99]"
+                className="relative cursor-pointer overflow-hidden rounded-full border border-border bg-card/80 px-4 py-2 font-medium text-foreground shadow-[0_4px_18px_rgba(0,0,0,0.16)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-8 before:rotate-12 before:bg-white/35 before:opacity-0 hover:-translate-y-0.5 hover:border-ring/45 hover:bg-muted hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45 active:translate-y-0 active:scale-[0.99]"
               >
                 Sign Out
               </button>
             ) : (
               <button
                 onClick={() => setIsAuthModalOpen(true)}
-                className="relative cursor-pointer overflow-hidden rounded-full border border-white/15 bg-white/10 px-4 py-2 font-medium text-white shadow-[0_4px_18px_rgba(0,0,0,0.28)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-8 before:rotate-12 before:bg-white/30 before:opacity-0 hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/18 hover:shadow-[0_10px_28px_rgba(255,255,255,0.16)] hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/45 active:translate-y-0 active:scale-[0.99]"
+                className="relative cursor-pointer overflow-hidden rounded-full border border-border bg-card/80 px-4 py-2 font-medium text-foreground shadow-[0_4px_18px_rgba(0,0,0,0.16)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-8 before:rotate-12 before:bg-white/35 before:opacity-0 hover:-translate-y-0.5 hover:border-ring/45 hover:bg-muted hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45 active:translate-y-0 active:scale-[0.99]"
               >
                 Sign In
               </button>
@@ -207,8 +215,8 @@ export default function Home() {
       <main className="relative z-10 mx-auto w-full max-w-6xl px-5 pb-16 pt-8 md:px-6 md:pt-16">
         <section className="grid items-center gap-12 md:grid-cols-[1fr_1.1fr] md:gap-10">
           <div className="max-w-xl space-y-7 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/8 px-3 py-1.5 text-xs text-white/80">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#00A896]" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card/75 px-3 py-1.5 text-xs text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Enterprise event operations platform
             </div>
 
@@ -220,7 +228,7 @@ export default function Home() {
               </span>
             </h1>
 
-            <p className="max-w-lg text-base leading-relaxed text-white/72 md:text-lg">
+            <p className="max-w-lg text-base leading-relaxed text-muted-foreground md:text-lg">
               EventForge centralizes planning, registration, and live RSVP intelligence so your team
               can launch faster and execute with confidence.
             </p>
@@ -228,26 +236,26 @@ export default function Home() {
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={handleGetStarted}
-                className="relative cursor-pointer overflow-hidden rounded-xl bg-white px-7 py-3 text-base font-semibold text-[#10121a] shadow-[0_10px_28px_rgba(0,0,0,0.35)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-10 before:rotate-12 before:bg-white/80 before:opacity-0 hover:-translate-y-0.5 hover:bg-[#f7f7f7] hover:shadow-[0_14px_36px_rgba(255,105,180,0.34)] hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF69B4]/60 active:translate-y-0 active:scale-[0.99]"
+                className="relative cursor-pointer overflow-hidden rounded-xl bg-primary px-7 py-3 text-base font-semibold text-primary-foreground shadow-[0_10px_28px_rgba(0,168,150,0.32)] transition-all duration-200 ease-out before:absolute before:inset-y-0 before:-left-10 before:w-10 before:rotate-12 before:bg-white/50 before:opacity-0 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-[0_14px_36px_rgba(0,168,150,0.36)] hover:before:left-[115%] hover:before:opacity-100 hover:before:transition-all hover:before:duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 active:translate-y-0 active:scale-[0.99]"
               >
                 Get Started Free
               </button>
               <button
                 onClick={handleBookDemo}
-                className="cursor-pointer rounded-xl border border-white/20 bg-white/8 px-5 py-3 text-sm font-semibold text-white/90 transition hover:-translate-y-0.5 hover:border-white/35 hover:bg-white/14"
+                className="cursor-pointer rounded-xl border border-border bg-card/80 px-5 py-3 text-sm font-semibold text-foreground transition hover:-translate-y-0.5 hover:border-ring/40 hover:bg-muted"
               >
                 Book Demo
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-white/60">
-              <span className="rounded-full border border-white/12 bg-white/6 px-3 py-1">
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-muted-foreground">
+              <span className="rounded-full border border-border bg-card/70 px-3 py-1">
                 No credit card required
               </span>
-              <span className="rounded-full border border-white/12 bg-white/6 px-3 py-1">
+              <span className="rounded-full border border-border bg-card/70 px-3 py-1">
                 SOC-ready workflows
               </span>
-              <span className="rounded-full border border-white/12 bg-white/6 px-3 py-1">
+              <span className="rounded-full border border-border bg-card/70 px-3 py-1">
                 24 min average setup
               </span>
             </div>
@@ -258,53 +266,53 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mt-16 rounded-2xl border border-white/12 bg-white/5 p-5 backdrop-blur md:mt-20 md:p-6">
+        <section className="mt-16 rounded-2xl border border-border bg-card/75 p-5 backdrop-blur md:mt-20 md:p-6">
           <div className="grid gap-6 sm:grid-cols-3">
             {quickStats.map((item) => (
               <div key={item.label} className="space-y-1">
-                <p className="text-xl font-semibold text-white md:text-2xl">{item.value}</p>
-                <p className="text-sm text-white/65">{item.label}</p>
+                <p className="text-xl font-semibold text-foreground md:text-2xl">{item.value}</p>
+                <p className="text-sm text-muted-foreground">{item.label}</p>
               </div>
             ))}
           </div>
         </section>
 
         <section className="mt-10">
-          <p className="text-center text-xs uppercase tracking-[0.16em] text-white/45">
+          <p className="text-center text-xs uppercase tracking-[0.16em] text-muted-foreground">
             Trusted by modern event teams
           </p>
           <div className="mt-5 flex flex-wrap items-center justify-center gap-3 md:gap-4">
             {trustedBy.map((brand) => (
               <span
                 key={brand}
-                className="rounded-full border border-white/12 bg-white/4 px-4 py-2 text-xs font-medium text-white/50 transition hover:border-white/20 hover:text-white/80"
+                className="rounded-full border border-border bg-card/65 px-4 py-2 text-xs font-medium text-muted-foreground transition hover:border-ring/35 hover:text-foreground"
               >
                 {brand}
               </span>
             ))}
-            <span className="rounded-full border border-[#00A896]/40 bg-[#00A896]/10 px-4 py-2 text-xs font-semibold text-[#9ef0e6]">
+            <span className="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary">
               92K RSVPs processed this month
             </span>
           </div>
         </section>
 
-        <section className="mt-12 rounded-2xl border border-white/12 bg-white/4 p-5 md:mt-14 md:p-6">
+        <section className="mt-12 rounded-2xl border border-border bg-card/70 p-5 md:mt-14 md:p-6">
           <div className="relative grid gap-6 md:grid-cols-3 md:gap-5">
-            <div className="pointer-events-none absolute left-8 right-8 top-4 hidden border-t border-white/10 md:block" />
+            <div className="pointer-events-none absolute left-8 right-8 top-4 hidden border-t border-border md:block" />
             {workflowSteps.map((item) => (
               <article
                 key={item.step}
-                className="rounded-xl border border-white/10 bg-[#11141d]/70 p-4 backdrop-blur"
+                className="rounded-xl border border-border bg-background/75 p-4 backdrop-blur"
               >
-                <p className="text-xs font-semibold tracking-[0.16em] text-[#ff9cd2]">
-                  {item.step}
+                <p className="text-xs font-semibold tracking-[0.16em] text-accent">{item.step}</p>
+                <h3 className="mt-2 text-lg font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.description}
                 </p>
-                <h3 className="mt-2 text-lg font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/65">{item.description}</p>
               </article>
             ))}
           </div>
-          <p className="mt-5 text-center text-xs text-white/45">
+          <p className="mt-5 text-center text-xs text-muted-foreground">
             No code, no clutter, no tool-hopping.
           </p>
         </section>

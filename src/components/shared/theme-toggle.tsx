@@ -1,6 +1,7 @@
 'use client';
 
 import { Moon, Sun } from 'lucide-react';
+import { useSyncExternalStore } from 'react';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui-store';
 
@@ -9,11 +10,28 @@ interface ThemeToggleProps {
 }
 
 export function ThemeToggle({ className }: ThemeToggleProps) {
+  const isClient = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const setTheme = useUiStore((state) => state.setTheme);
   const handleToggle = () => {
     const isDark = document.documentElement.classList.contains('dark');
     setTheme(isDark ? 'light' : 'dark');
   };
+
+  if (!isClient) {
+    return (
+      <span
+        aria-hidden="true"
+        className={cn(
+          'inline-flex h-7 w-14 rounded-full border border-border/70 bg-card/70 shadow-[0_6px_16px_rgba(0,0,0,0.14)] dark:shadow-[0_6px_16px_rgba(0,0,0,0.3)]',
+          className
+        )}
+      />
+    );
+  }
 
   return (
     <button
@@ -26,7 +44,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       )}
       suppressHydrationWarning
     >
-      <span className="pointer-events-none absolute left-0.5 top-0.5 h-6 w-6 rounded-full bg-white shadow-[0_4px_10px_rgba(0,0,0,0.22)] transition-transform duration-300 dark:translate-x-7 dark:bg-black" />
+      <span className="pointer-events-none absolute left-0.5 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-white shadow-[0_4px_10px_rgba(0,0,0,0.22)] transition-transform duration-300 dark:translate-x-7 dark:bg-black" />
 
       <Sun className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-white opacity-100 transition-all duration-200 dark:translate-x-1 dark:opacity-0" />
       <Moon className="pointer-events-none absolute left-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-white opacity-0 transition-all duration-200 dark:opacity-100" />

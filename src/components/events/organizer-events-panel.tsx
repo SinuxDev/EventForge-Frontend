@@ -276,15 +276,15 @@ export function OrganizerEventsPanel() {
                 return (
                   <article
                     key={event._id}
-                    className="group overflow-hidden rounded-2xl border border-border bg-card/85 transition hover:border-ring/30"
+                    className="group overflow-hidden rounded-2xl border border-border bg-card/90 shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-ring/35 hover:shadow-[0_14px_32px_rgba(0,0,0,0.1)]"
                   >
-                    <div className="relative h-44 border-b border-border bg-muted/35">
+                    <div className="relative aspect-video border-b border-border bg-muted/35">
                       {event.coverImage ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={toPublicMediaUrl(event.coverImage)}
                           alt={event.title}
-                          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
@@ -292,9 +292,9 @@ export function OrganizerEventsPanel() {
                         </div>
                       )}
 
-                      <div className="absolute inset-0 bg-linear-to-t from-black/35 via-black/10 to-transparent dark:from-[#070a11]/90 dark:via-[#070a11]/25" />
+                      <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/10 to-transparent" />
 
-                      <div className="absolute left-3 top-3 flex items-center gap-2">
+                      <div className="absolute left-3 top-3">
                         <span
                           className={`rounded-full border px-2.5 py-1 text-xs font-medium backdrop-blur ${getStatusChipClass(event.status)}`}
                         >
@@ -302,64 +302,73 @@ export function OrganizerEventsPanel() {
                         </span>
                       </div>
 
-                      <div className="absolute bottom-3 left-3 right-3 text-xs text-foreground">
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-2.5 py-1 backdrop-blur dark:border-white/20 dark:bg-black/45 dark:text-white/90">
+                      <div className="absolute right-3 top-3 text-xs">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-2.5 py-1 text-white/90 backdrop-blur">
                           <CalendarClock className="h-3.5 w-3.5" />
                           {formatEventDate(event.startDateTime, event.timezone)}
                         </span>
                       </div>
                     </div>
 
-                    <div className="space-y-4 p-4">
-                      <div className="space-y-1.5">
-                        <h3 className="line-clamp-1 text-lg font-semibold text-foreground">
+                    <div className="space-y-4 p-5">
+                      <div className="space-y-2">
+                        <h3 className="line-clamp-1 text-xl font-semibold text-foreground">
                           {event.title}
                         </h3>
-                        <p className="line-clamp-2 text-sm text-muted-foreground">
+                        <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">
                           {event.shortSummary}
                         </p>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-2.5 py-1 text-muted-foreground">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-2.5 py-1 text-muted-foreground">
                           <CalendarRange className="h-3.5 w-3.5" />
                           {getLocationLabel(event)}
                         </span>
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/70 px-2.5 py-1 text-muted-foreground">
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-2.5 py-1 text-muted-foreground">
                           <CircleDot className="h-3.5 w-3.5" />
                           {seats}/{event.capacity} seats
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Link
+                            href={`/dashboard/organizer/events/${event._id}`}
+                            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-primary/35 bg-primary/12 px-3 text-sm font-medium text-primary transition hover:border-primary/55 hover:bg-primary/18"
+                          >
+                            <Eye className="h-4 w-4" />
+                            Details
+                          </Link>
+
+                          <Link
+                            href={`/events/new?draftId=${event._id}`}
+                            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background/80 px-3 text-sm font-medium text-foreground transition hover:border-ring/35 hover:bg-muted"
+                          >
+                            <FilePenLine className="h-4 w-4" />
+                            Edit
+                          </Link>
+                        </div>
+
                         <Link
                           href={`/dashboard/organizer/events/${event._id}`}
-                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-primary/35 bg-primary/12 px-3 text-sm font-medium text-primary transition hover:border-primary/55 hover:bg-primary/18"
+                          className="inline-flex h-9 items-center text-xs font-medium text-muted-foreground transition hover:text-foreground"
                         >
-                          <Eye className="h-4 w-4" />
-                          Details
+                          Open event
                         </Link>
-
-                        <Link
-                          href={`/events/new?draftId=${event._id}`}
-                          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-border bg-background/80 px-3 text-sm font-medium text-foreground transition hover:border-ring/35 hover:bg-muted"
-                        >
-                          <FilePenLine className="h-4 w-4" />
-                          Edit
-                        </Link>
-
-                        {event.status === 'draft' ? (
-                          <Button
-                            type="button"
-                            className="h-9 gap-1.5"
-                            disabled={isPublishing}
-                            onClick={() => publishMutation.mutate(event._id)}
-                          >
-                            <Megaphone className="h-4 w-4" />
-                            {isPublishing ? 'Publishing...' : 'Publish'}
-                          </Button>
-                        ) : null}
                       </div>
+
+                      {event.status === 'draft' ? (
+                        <Button
+                          type="button"
+                          className="h-9 gap-1.5"
+                          disabled={isPublishing}
+                          onClick={() => publishMutation.mutate(event._id)}
+                        >
+                          <Megaphone className="h-4 w-4" />
+                          {isPublishing ? 'Publishing...' : 'Publish'}
+                        </Button>
+                      ) : null}
                     </div>
                   </article>
                 );

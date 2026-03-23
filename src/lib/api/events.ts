@@ -80,6 +80,17 @@ interface ListMyEventsOptions {
   limit?: number;
 }
 
+export interface ListPublicEventsOptions {
+  page?: number;
+  limit?: number;
+  query?: string;
+  category?: string;
+  attendanceMode?: 'in_person' | 'online' | 'hybrid';
+  startDateFrom?: string;
+  startDateTo?: string;
+  sort?: 'soonest' | 'latest';
+}
+
 export async function listMyEvents(
   accessToken: string,
   options: ListMyEventsOptions = {}
@@ -101,6 +112,58 @@ export async function listMyEvents(
     }
   );
 
+  return response.data;
+}
+
+export async function listPublicEvents(
+  options: ListPublicEventsOptions = {}
+): Promise<PaginatedEvents> {
+  const query = new URLSearchParams();
+
+  query.set('status', 'published');
+  query.set('visibility', 'public');
+
+  if (options.page) {
+    query.set('page', String(options.page));
+  }
+
+  if (options.limit) {
+    query.set('limit', String(options.limit));
+  }
+
+  if (options.query) {
+    query.set('q', options.query);
+  }
+
+  if (options.category) {
+    query.set('category', options.category);
+  }
+
+  if (options.attendanceMode) {
+    query.set('attendanceMode', options.attendanceMode);
+  }
+
+  if (options.startDateFrom) {
+    query.set('startDateFrom', options.startDateFrom);
+  }
+
+  if (options.startDateTo) {
+    query.set('startDateTo', options.startDateTo);
+  }
+
+  if (options.sort) {
+    query.set('sort', options.sort);
+  }
+
+  const response = await apiClient.get<ApiEnvelope<PaginatedEvents>>(
+    `/events/public${query.toString() ? `?${query.toString()}` : ''}`
+  );
+
+  return response.data;
+}
+
+export async function getPublicEventById(eventId: string): Promise<EventEntity> {
+  const response = await apiClient.get<ApiEnvelope<EventEntity>>(`/events/public/${eventId}`);
   return response.data;
 }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { signOut, useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { AuthModal } from '@/components/shared/auth-modal';
@@ -181,9 +182,9 @@ export default function Home() {
 
           <div className="flex items-center gap-3 text-xs text-muted-foreground sm:gap-4 sm:text-sm">
             <span className="hidden sm:inline">{timezoneLabel}</span>
-            <a href="#" className="hidden transition hover:text-foreground sm:inline">
+            <Link href="/events" className="hidden transition hover:text-foreground sm:inline">
               Explore Events ↗
-            </a>
+            </Link>
             <ThemeToggle />
             {status === 'loading' ? (
               <button

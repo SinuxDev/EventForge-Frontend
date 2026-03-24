@@ -267,10 +267,17 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="mt-16 rounded-2xl border border-border bg-card/75 p-5 backdrop-blur md:mt-20 md:p-6">
-          <div className="grid gap-6 sm:grid-cols-3">
-            {quickStats.map((item) => (
-              <div key={item.label} className="space-y-1">
+        <section className="mt-16 rounded-2xl border border-border bg-card/75 p-3 backdrop-blur md:mt-20 md:p-4">
+          <div className="grid gap-0 overflow-hidden rounded-xl border border-border/70 bg-background/25 sm:grid-cols-3">
+            {quickStats.map((item, index) => (
+              <div
+                key={item.label}
+                className={`space-y-1 px-5 py-4 text-center sm:py-5 ${
+                  index < quickStats.length - 1
+                    ? 'border-b border-border/70 sm:border-b-0 sm:border-r'
+                    : ''
+                }`}
+              >
                 <p className="text-xl font-semibold text-foreground md:text-2xl">{item.value}</p>
                 <p className="text-sm text-muted-foreground">{item.label}</p>
               </div>

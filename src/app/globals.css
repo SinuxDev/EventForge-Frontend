@@ -2,53 +2,13 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: local('Manrope'), local('Segoe UI'), local('Arial');
-}
-
-@font-face {
-  font-family: 'Manrope';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: local('Manrope'), local('Segoe UI Semibold'), local('Arial Bold');
-}
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: local('Poppins'), local('Segoe UI Semibold'), local('Arial Bold');
-}
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: local('Poppins'), local('Segoe UI Bold'), local('Arial Bold');
-}
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: local('Poppins'), local('Segoe UI Black'), local('Arial Black');
-}
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Manrope', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: 'Manrope', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: var(--font-space-grotesk), 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: var(--font-space-grotesk), 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -165,13 +125,5 @@
   }
   html {
     @apply font-sans;
-  }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: 'Poppins', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   }
 }

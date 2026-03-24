@@ -1,7 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { AdminActionDialog, type ActionDialogState } from '@/components/admin/admin-action-dialog';
+import { AdminAuditLogList } from '@/components/admin/admin-audit-log-list';
+import { AdminUsersTable } from '@/components/admin/admin-users-table';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { PublishSuccessToast } from '@/components/dashboard/publish-success-toast';
 import {
@@ -11,52 +14,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useAdminRoleUpdate, useAdminSuspensionUpdate } from '@/hooks/use-admin-actions';
+import { useAdminAuditLogs } from '@/hooks/use-admin-audit-logs';
+import { useAdminUsers } from '@/hooks/use-admin-users';
 import { toast } from '@/hooks/use-toast';
-import { apiClient } from '@/lib/api-client';
-
-type UserRole = 'attendee' | 'organizer' | 'admin';
-
-interface AdminUser {
-  _id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  isSuspended: boolean;
-  provider: 'credentials' | 'google' | 'github';
-  createdAt: string;
-}
-
-interface PaginationPayload {
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-}
-
-interface ListUsersResponse {
-  success: boolean;
-  message: string;
-  data: {
-    data: AdminUser[];
-    pagination: PaginationPayload;
-  };
-}
-
-interface UserActionResponse {
-  success: boolean;
-  message: string;
-  data: AdminUser;
-}
+import type { AdminAuditAction, AdminUser, AdminUserRole } from '@/types/admin';
 
 export default function AdminDashboardPage() {
   const { data: session } = useSession();
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
   const [searchText, setSearchText] = useState('');
-  const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all');
+  const [roleFilter, setRoleFilter] = useState<'all' | AdminUserRole>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended'>('all');
+  const [usersPage, setUsersPage] = useState(1);
+
+  const [auditActionFilter, setAuditActionFilter] = useState<'all' | AdminAuditAction>('all');
+  const [auditPage, setAuditPage] = useState(1);
+
+  const [actionDialogState, setActionDialogState] = useState<ActionDialogState | null>(null);
+  const [actionReason, setActionReason] = useState('');
 
   const authHeader = useMemo(() => {
     if (!session?.accessToken) {
@@ -68,115 +44,117 @@ export default function AdminDashboardPage() {
     };
   }, [session?.accessToken]);
 
-  const fetchUsers = async () => {
-    if (!authHeader) {
+  const usersQuery = useAdminUsers({
+    headers: authHeader,
+    page: usersPage,
+    filters: {
+      q: searchText,
+      role: roleFilter,
+      status: statusFilter,
+    },
+  });
+
+  const auditLogsQuery = useAdminAuditLogs({
+    headers: authHeader,
+    page: auditPage,
+    action: auditActionFilter,
+  });
+
+  const roleMutation = useAdminRoleUpdate(authHeader);
+  const suspensionMutation = useAdminSuspensionUpdate(authHeader);
+
+  const isSubmittingAction = roleMutation.isPending || suspensionMutation.isPending;
+
+  const openRoleDialog = (targetUser: AdminUser, nextRole: AdminUserRole) => {
+    if (targetUser.role === nextRole) {
       return;
     }
 
-    setIsLoadingUsers(true);
+    setActionDialogState({
+      kind: 'role',
+      targetUser,
+      nextRole,
+    });
+    setActionReason('');
+  };
 
-    const query = new URLSearchParams();
-    query.set('page', '1');
-    query.set('limit', '20');
+  const openSuspensionDialog = (targetUser: AdminUser) => {
+    setActionDialogState({
+      kind: 'suspension',
+      targetUser,
+      nextSuspendedState: !targetUser.isSuspended,
+    });
+    setActionReason('');
+  };
 
-    if (searchText.trim()) {
-      query.set('q', searchText.trim());
+  const handleApplyUsersFilters = () => {
+    setUsersPage(1);
+    usersQuery.refetch();
+  };
+
+  const handleApplyAuditFilter = () => {
+    setAuditPage(1);
+    auditLogsQuery.refetch();
+  };
+
+  const closeActionDialog = () => {
+    if (isSubmittingAction) {
+      return;
     }
 
-    if (roleFilter !== 'all') {
-      query.set('role', roleFilter);
+    setActionDialogState(null);
+    setActionReason('');
+  };
+
+  const submitAction = async () => {
+    if (!actionDialogState) {
+      return;
     }
 
-    if (statusFilter === 'active') {
-      query.set('isSuspended', 'false');
-    }
-
-    if (statusFilter === 'suspended') {
-      query.set('isSuspended', 'true');
+    if (actionReason.trim().length < 3) {
+      toast({
+        title: 'Please provide a reason (minimum 3 characters)',
+        variant: 'destructive',
+      });
+      return;
     }
 
     try {
-      const result = await apiClient.get<ListUsersResponse>(`/admin/users?${query.toString()}`, {
-        headers: authHeader,
-      });
+      if (actionDialogState.kind === 'role') {
+        await roleMutation.mutateAsync({
+          userId: actionDialogState.targetUser._id,
+          role: actionDialogState.nextRole,
+          reason: actionReason.trim(),
+        });
 
-      setUsers(result.data.data);
+        toast({ title: 'User role updated' });
+      } else {
+        const result = await suspensionMutation.mutateAsync({
+          userId: actionDialogState.targetUser._id,
+          isSuspended: actionDialogState.nextSuspendedState,
+          reason: actionReason.trim(),
+        });
+
+        toast({
+          title: result.data.isSuspended ? 'User suspended' : 'User unsuspended',
+        });
+      }
+
+      setActionDialogState(null);
+      setActionReason('');
+      await Promise.all([usersQuery.refetch(), auditLogsQuery.refetch()]);
     } catch (error) {
       toast({
-        title: error instanceof Error ? error.message : 'Unable to fetch users',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoadingUsers(false);
-    }
-  };
-
-  const handleRoleChange = async (targetUserId: string, nextRole: UserRole) => {
-    if (!authHeader) {
-      return;
-    }
-
-    try {
-      const result = await apiClient.patch<UserActionResponse>(
-        `/admin/users/${targetUserId}/role`,
-        { role: nextRole },
-        { headers: authHeader }
-      );
-
-      setUsers((current) =>
-        current.map((user) =>
-          user._id === targetUserId ? { ...user, role: result.data.role } : user
-        )
-      );
-
-      toast({ title: 'User role updated' });
-    } catch (error) {
-      toast({
-        title: error instanceof Error ? error.message : 'Unable to update user role',
+        title: error instanceof Error ? error.message : 'Unable to complete admin action',
         variant: 'destructive',
       });
     }
   };
-
-  const handleSuspensionToggle = async (targetUser: AdminUser) => {
-    if (!authHeader) {
-      return;
-    }
-
-    try {
-      const result = await apiClient.patch<UserActionResponse>(
-        `/admin/users/${targetUser._id}/suspension`,
-        { isSuspended: !targetUser.isSuspended },
-        { headers: authHeader }
-      );
-
-      setUsers((current) =>
-        current.map((user) =>
-          user._id === targetUser._id ? { ...user, isSuspended: result.data.isSuspended } : user
-        )
-      );
-
-      toast({ title: result.data.isSuspended ? 'User suspended' : 'User unsuspended' });
-    } catch (error) {
-      toast({
-        title: error instanceof Error ? error.message : 'Unable to update suspension',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (!authHeader) {
-      return;
-    }
-
-    fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authHeader]);
 
   return (
     <DashboardShell requiredRole="admin">
       <PublishSuccessToast />
+
       <section className="w-full space-y-5">
         <section className="rounded-2xl border border-border bg-card/80 p-6 backdrop-blur">
           <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
@@ -189,7 +167,7 @@ export default function AdminDashboardPage() {
             </span>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            Manage user roles and account status with centralized controls.
+            Manage user access with safer controls, reason tracking, and admin audit trails.
           </p>
         </section>
 
@@ -204,7 +182,7 @@ export default function AdminDashboardPage() {
 
             <Select
               value={roleFilter}
-              onValueChange={(value) => setRoleFilter(value as 'all' | UserRole)}
+              onValueChange={(value) => setRoleFilter(value as 'all' | AdminUserRole)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Filter by role" />
@@ -232,87 +210,44 @@ export default function AdminDashboardPage() {
             </Select>
 
             <button
-              onClick={fetchUsers}
+              onClick={handleApplyUsersFilters}
               className="h-11 rounded-xl border border-border bg-background/80 px-4 text-sm font-semibold text-foreground transition hover:border-ring/35 hover:bg-muted"
             >
               Apply filters
             </button>
           </div>
 
-          <div className="mt-4 overflow-x-auto rounded-xl border border-border bg-card/70">
-            <table className="w-full min-w-195 border-collapse">
-              <thead className="bg-muted/45 text-left text-xs uppercase tracking-[0.12em] text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3">User</th>
-                  <th className="px-4 py-3">Role</th>
-                  <th className="px-4 py-3">Provider</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isLoadingUsers ? (
-                  <tr>
-                    <td className="px-4 py-6 text-sm text-muted-foreground" colSpan={5}>
-                      Loading users...
-                    </td>
-                  </tr>
-                ) : users.length === 0 ? (
-                  <tr>
-                    <td className="px-4 py-6 text-sm text-muted-foreground" colSpan={5}>
-                      No users found for the selected filters.
-                    </td>
-                  </tr>
-                ) : (
-                  users.map((user) => (
-                    <tr key={user._id} className="border-t border-border text-sm text-foreground">
-                      <td className="px-4 py-3.5">
-                        <p className="font-medium text-foreground">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">{user.email}</p>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <Select
-                          value={user.role}
-                          onValueChange={(value) => handleRoleChange(user._id, value as UserRole)}
-                        >
-                          <SelectTrigger className="h-9 w-37.5">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="attendee">attendee</SelectItem>
-                            <SelectItem value="organizer">organizer</SelectItem>
-                            <SelectItem value="admin">admin</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </td>
-                      <td className="px-4 py-3.5 text-muted-foreground">{user.provider}</td>
-                      <td className="px-4 py-3.5">
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                            user.isSuspended
-                              ? 'border border-destructive/35 bg-destructive/10 text-destructive'
-                              : 'border border-primary/35 bg-primary/10 text-primary'
-                          }`}
-                        >
-                          {user.isSuspended ? 'suspended' : 'active'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3.5">
-                        <button
-                          onClick={() => handleSuspensionToggle(user)}
-                          className="rounded-lg border border-border bg-background/80 px-3 py-1.5 text-xs font-semibold text-foreground transition hover:border-ring/35 hover:bg-muted"
-                        >
-                          {user.isSuspended ? 'Unsuspend' : 'Suspend'}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+          <AdminUsersTable
+            users={usersQuery.data?.data.data ?? []}
+            pagination={usersQuery.data?.data.pagination ?? null}
+            isLoading={usersQuery.isFetching}
+            onRoleChangeRequest={openRoleDialog}
+            onSuspensionToggleRequest={openSuspensionDialog}
+            onPreviousPage={() => setUsersPage((current) => Math.max(1, current - 1))}
+            onNextPage={() => setUsersPage((current) => current + 1)}
+          />
         </section>
+
+        <AdminAuditLogList
+          logs={auditLogsQuery.data?.data.data ?? []}
+          pagination={auditLogsQuery.data?.data.pagination ?? null}
+          isLoading={auditLogsQuery.isFetching}
+          actionFilter={auditActionFilter}
+          onActionFilterChange={setAuditActionFilter}
+          onApplyFilter={handleApplyAuditFilter}
+          onPreviousPage={() => setAuditPage((current) => Math.max(1, current - 1))}
+          onNextPage={() => setAuditPage((current) => current + 1)}
+        />
       </section>
+
+      <AdminActionDialog
+        state={actionDialogState}
+        reason={actionReason}
+        isSubmitting={isSubmittingAction}
+        onReasonChange={setActionReason}
+        onClose={closeActionDialog}
+        onConfirm={submitAction}
+      />
     </DashboardShell>
   );
 }

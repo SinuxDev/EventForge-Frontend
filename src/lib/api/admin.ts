@@ -1,8 +1,17 @@
 import { apiClient } from '@/lib/api-client';
 import type {
+  AdminEmailAudienceMode,
+  AdminEmailAudienceStatus,
+  AdminEmailTemplateKey,
+  AdminEmailCampaignResponse,
+  AdminEmailCampaignsResponse,
+  AdminEmailDeliveryLogsResponse,
   AdminAuditAction,
   AdminUserActionResponse,
   AdminUserRole,
+  ComplianceCaseResponse,
+  ComplianceRiskOverviewResponse,
+  ListComplianceCasesResponse,
   ListAdminAuditLogsResponse,
   ListAdminUsersResponse,
 } from '@/types/admin';
@@ -75,4 +84,120 @@ export async function updateAdminUserSuspension(
   return apiClient.patch<AdminUserActionResponse>(`/admin/users/${userId}/suspension`, payload, {
     headers,
   });
+}
+
+interface ListComplianceCasesOptions {
+  page: number;
+  limit: number;
+  status?: 'open' | 'in_review' | 'actioned' | 'resolved';
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+}
+
+export async function getComplianceRiskOverview(headers: AuthHeader) {
+  return apiClient.get<ComplianceRiskOverviewResponse>('/admin/compliance/risk-overview', {
+    headers,
+  });
+}
+
+export async function listComplianceCases(
+  options: ListComplianceCasesOptions,
+  headers: AuthHeader
+) {
+  const query = new URLSearchParams();
+  query.set('page', String(options.page));
+  query.set('limit', String(options.limit));
+
+  if (options.status) {
+    query.set('status', options.status);
+  }
+
+  if (options.severity) {
+    query.set('severity', options.severity);
+  }
+
+  return apiClient.get<ListComplianceCasesResponse>(`/admin/compliance/cases?${query.toString()}`, {
+    headers,
+  });
+}
+
+export async function createComplianceCase(
+  payload: {
+    title: string;
+    description: string;
+    category: 'account_abuse' | 'content_policy' | 'payment_risk' | 'policy_violation' | 'other';
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    linkedUserId?: string;
+    linkedEventId?: string;
+    assignedAdminId?: string;
+    dueAt?: string;
+  },
+  headers: AuthHeader
+) {
+  return apiClient.post<ComplianceCaseResponse>('/admin/compliance/cases', payload, { headers });
+}
+
+export async function updateComplianceCaseStatus(
+  caseId: string,
+  payload: {
+    status: 'open' | 'in_review' | 'actioned' | 'resolved';
+    resolutionNote?: string;
+    reason: string;
+  },
+  headers: AuthHeader
+) {
+  return apiClient.patch<ComplianceCaseResponse>(
+    `/admin/compliance/cases/${caseId}/status`,
+    payload,
+    {
+      headers,
+    }
+  );
+}
+
+export async function sendAdminEmailCampaign(
+  payload: {
+    subject: string;
+    body: string;
+    templateKey: AdminEmailTemplateKey;
+    audienceMode: AdminEmailAudienceMode;
+    targetRoles: AdminUserRole[];
+    targetStatus: AdminEmailAudienceStatus;
+    selectedUserIds?: string[];
+    reason: string;
+  },
+  headers: AuthHeader
+) {
+  return apiClient.post<AdminEmailCampaignResponse>('/admin/email/campaigns/send', payload, {
+    headers,
+  });
+}
+
+export async function listAdminEmailCampaigns(
+  options: { page: number; limit: number },
+  headers: AuthHeader
+) {
+  const query = new URLSearchParams();
+  query.set('page', String(options.page));
+  query.set('limit', String(options.limit));
+
+  return apiClient.get<AdminEmailCampaignsResponse>(`/admin/email/campaigns?${query.toString()}`, {
+    headers,
+  });
+}
+
+export async function listAdminEmailDeliveryLogs(
+  campaignId: string,
+  options: { page: number; limit: number },
+  headers: AuthHeader
+) {
+  const query = new URLSearchParams();
+  query.set('page', String(options.page));
+  query.set('limit', String(options.limit));
+
+  return apiClient.get<AdminEmailDeliveryLogsResponse>(
+    `/admin/email/campaigns/${campaignId}/logs?${query.toString()}`,
+    {
+      headers,
+    }
+  );
 }

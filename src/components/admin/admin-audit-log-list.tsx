@@ -20,6 +20,18 @@ function getActionLabel(action: AdminAuditAction): string {
     return 'Role changed';
   }
 
+  if (action === 'compliance.case.created') {
+    return 'Compliance case created';
+  }
+
+  if (action === 'compliance.case.status.updated') {
+    return 'Compliance case status changed';
+  }
+
+  if (action === 'admin.email.campaign.sent') {
+    return 'Admin email campaign sent';
+  }
+
   return 'Suspension updated';
 }
 
@@ -68,6 +80,11 @@ export function AdminAuditLogList({
             <SelectItem value="all">All actions</SelectItem>
             <SelectItem value="user.role.updated">Role changed</SelectItem>
             <SelectItem value="user.suspension.updated">Suspension updated</SelectItem>
+            <SelectItem value="compliance.case.created">Compliance case created</SelectItem>
+            <SelectItem value="compliance.case.status.updated">
+              Compliance case status changed
+            </SelectItem>
+            <SelectItem value="admin.email.campaign.sent">Admin email campaign sent</SelectItem>
           </SelectContent>
         </Select>
       </div>

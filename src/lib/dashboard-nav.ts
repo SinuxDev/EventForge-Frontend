@@ -1,4 +1,14 @@
-import { Compass, LayoutDashboard, LifeBuoy, PlusSquare, Rows3, UserRoundCog } from 'lucide-react';
+import {
+  Compass,
+  LayoutDashboard,
+  LifeBuoy,
+  Mail,
+  PlusSquare,
+  Rows3,
+  ScrollText,
+  ShieldAlert,
+  Users,
+} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { AppUserRole } from '@/lib/auth-redirect';
 
@@ -33,7 +43,11 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
   admin: {
     title: 'Admin workspace',
     items: [
-      { href: '/dashboard/admin', label: 'User governance', icon: UserRoundCog },
+      { href: '/dashboard/admin', label: 'Overview', icon: LayoutDashboard },
+      { href: '/dashboard/admin/users', label: 'User governance', icon: Users },
+      { href: '/dashboard/admin/compliance', label: 'Compliance', icon: ShieldAlert },
+      { href: '/dashboard/admin/email', label: 'Email center', icon: Mail },
+      { href: '/dashboard/admin/audit', label: 'Audit logs', icon: ScrollText },
       { href: '/book-demo', label: 'Support', icon: LifeBuoy },
     ],
   },

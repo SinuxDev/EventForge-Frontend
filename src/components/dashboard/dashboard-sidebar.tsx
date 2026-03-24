@@ -30,6 +30,11 @@ export function DashboardSidebar({
     }
   };
 
+  const matchedActiveHref =
+    items
+      .filter((item) => activePath === item.href || activePath.startsWith(`${item.href}/`))
+      .sort((a, b) => b.href.length - a.href.length)[0]?.href ?? '';
+
   return (
     <aside
       className={cn(
@@ -64,7 +69,7 @@ export function DashboardSidebar({
 
       <nav className="mt-5 space-y-2">
         {items.map((item) => {
-          const isActive = activePath === item.href || activePath.startsWith(`${item.href}/`);
+          const isActive = item.href === matchedActiveHref;
 
           return (
             <Link

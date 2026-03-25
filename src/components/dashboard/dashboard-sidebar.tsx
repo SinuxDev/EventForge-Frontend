@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import type { DashboardNavItem } from '@/lib/dashboard-nav';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +17,50 @@ interface DashboardSidebarProps {
   onSignOut: () => void;
 }
 
+type IconMotionPreset = {
+  hover: {
+    scale?: number;
+    x?: number | number[];
+    y?: number | number[];
+    rotate?: number | number[];
+  };
+  tap: {
+    scale?: number;
+  };
+};
+
+const DEFAULT_ICON_PRESET: IconMotionPreset = {
+  hover: { scale: 1.12, y: -1 },
+  tap: { scale: 0.94 },
+};
+
+const NAV_ICON_PRESETS: Record<string, IconMotionPreset> = {
+  '/dashboard/admin/users': {
+    hover: { scale: 1.12, rotate: -10, y: -1 },
+    tap: { scale: 0.94 },
+  },
+  '/dashboard/admin/compliance': {
+    hover: { scale: 1.1, rotate: 8, y: -1 },
+    tap: { scale: 0.94 },
+  },
+  '/dashboard/admin/email': {
+    hover: { scale: 1.12, rotate: -7, y: -1 },
+    tap: { scale: 0.94 },
+  },
+  '/dashboard/admin/email/history': {
+    hover: { scale: 1.1, x: 1, rotate: -8 },
+    tap: { scale: 0.94 },
+  },
+  '/dashboard/admin/audit': {
+    hover: { scale: 1.1, y: -1, rotate: 6 },
+    tap: { scale: 0.94 },
+  },
+  '/book-demo': {
+    hover: { scale: 1.1, rotate: 10, y: -1 },
+    tap: { scale: 0.94 },
+  },
+};
+
 export function DashboardSidebar({
   title,
   items,
@@ -24,6 +70,9 @@ export function DashboardSidebar({
   onNavigate,
   onSignOut,
 }: DashboardSidebarProps) {
+  const prefersReducedMotion = useReducedMotion();
+  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
+
   const handleNavigate = () => {
     if (onNavigate) {
       onNavigate();
@@ -76,16 +125,39 @@ export function DashboardSidebar({
               key={item.href}
               href={item.href}
               onClick={handleNavigate}
+              onMouseEnter={() => setHoveredHref(item.href)}
+              onMouseLeave={() =>
+                setHoveredHref((current) => (current === item.href ? null : current))
+              }
+              onFocus={() => setHoveredHref(item.href)}
+              onBlur={() => setHoveredHref((current) => (current === item.href ? null : current))}
               title={isCollapsed ? item.label : undefined}
               className={cn(
-                'flex items-center rounded-xl border text-sm transition',
+                'group flex items-center rounded-xl border text-sm transition',
                 isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5',
                 isActive
                   ? 'border-primary/45 bg-primary/15 text-primary'
                   : 'border-transparent text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground'
               )}
             >
-              <item.icon className="h-4 w-4" />
+              <motion.span
+                className="inline-flex h-4 w-4 shrink-0"
+                animate={
+                  prefersReducedMotion
+                    ? undefined
+                    : hoveredHref === item.href
+                      ? (NAV_ICON_PRESETS[item.href] ?? DEFAULT_ICON_PRESET).hover
+                      : { scale: 1, x: 0, y: 0, rotate: 0 }
+                }
+                whileTap={
+                  prefersReducedMotion
+                    ? undefined
+                    : (NAV_ICON_PRESETS[item.href] ?? DEFAULT_ICON_PRESET).tap
+                }
+                transition={{ type: 'spring', stiffness: 380, damping: 18, mass: 0.45 }}
+              >
+                <item.icon className="h-4 w-4" />
+              </motion.span>
               {!isCollapsed ? <span>{item.label}</span> : null}
             </Link>
           );

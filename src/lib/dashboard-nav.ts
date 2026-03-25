@@ -1,5 +1,6 @@
 import {
   Compass,
+  History,
   LayoutDashboard,
   LifeBuoy,
   Mail,
@@ -47,6 +48,7 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
       { href: '/dashboard/admin/users', label: 'User governance', icon: Users },
       { href: '/dashboard/admin/compliance', label: 'Compliance', icon: ShieldAlert },
       { href: '/dashboard/admin/email', label: 'Email center', icon: Mail },
+      { href: '/dashboard/admin/email/history', label: 'Campaign history', icon: History },
       { href: '/dashboard/admin/audit', label: 'Audit logs', icon: ScrollText },
       { href: '/book-demo', label: 'Support', icon: LifeBuoy },
     ],

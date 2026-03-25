@@ -1,12 +1,8 @@
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { AdminEmailPanel } from '@/components/admin/admin-email-panel';
-import {
-  useAdminEmailCampaigns,
-  useAdminEmailDeliveryLogs,
-  useAdminEmailRecipientSearch,
-  useSendAdminEmailCampaign,
-} from '@/hooks/use-admin-email';
+import { useAdminEmailRecipientSearch, useSendAdminEmailCampaign } from '@/hooks/use-admin-email';
 import { toast } from '@/hooks/use-toast';
 import type {
   AdminEmailAudienceMode,
@@ -17,8 +13,6 @@ import type {
 
 export function AdminEmailView() {
   const { data: session } = useSession();
-  const [emailCampaignsPage, setEmailCampaignsPage] = useState(1);
-  const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
   const [manualSearchQuery, setManualSearchQuery] = useState('');
 
   const authHeader = useMemo(() => {
@@ -31,10 +25,10 @@ export function AdminEmailView() {
     };
   }, [session?.accessToken]);
 
-  const emailCampaignsQuery = useAdminEmailCampaigns(authHeader, emailCampaignsPage);
-  const emailDeliveryLogsQuery = useAdminEmailDeliveryLogs(authHeader, selectedCampaignId, 1);
   const recipientSearchQuery = useAdminEmailRecipientSearch(authHeader, manualSearchQuery);
   const sendAdminEmailCampaignMutation = useSendAdminEmailCampaign(authHeader);
+
+  const recipientCount = recipientSearchQuery.data?.data.pagination.total ?? 0;
 
   return (
     <div className="space-y-5">
@@ -44,20 +38,44 @@ export function AdminEmailView() {
         </p>
         <h1 className="mt-3 text-2xl font-bold md:text-3xl">Email operations</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          Send policy communications by role segment and review delivery outcomes.
+          Compose targeted campaigns in a dedicated operations studio, then monitor performance in a
+          separate history cockpit.
         </p>
+
+        <div className="mt-5 inline-flex rounded-full border border-border bg-background/80 p-1">
+          <Link
+            href="/dashboard/admin/email"
+            className="rounded-full bg-primary/20 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary"
+          >
+            Operations
+          </Link>
+          <Link
+            href="/dashboard/admin/email/history"
+            className="rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition hover:text-foreground"
+          >
+            Campaign history
+          </Link>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <article className="rounded-xl border border-border bg-background/80 px-4 py-3">
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Mode</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">Campaign composer</p>
+          </article>
+          <article className="rounded-xl border border-border bg-background/80 px-4 py-3">
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+              Search results
+            </p>
+            <p className="mt-1 text-lg font-semibold text-primary">{recipientCount}</p>
+          </article>
+          <article className="rounded-xl border border-border bg-background/80 px-4 py-3">
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Transport</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">SMTP pipeline</p>
+          </article>
+        </div>
       </section>
 
       <AdminEmailPanel
-        campaigns={emailCampaignsQuery.data?.data.data ?? []}
-        campaignsPagination={emailCampaignsQuery.data?.data.pagination ?? null}
-        deliveryLogs={emailDeliveryLogsQuery.data?.data.data ?? []}
-        isLoadingCampaigns={emailCampaignsQuery.isFetching}
-        isLoadingDeliveryLogs={emailDeliveryLogsQuery.isFetching}
-        selectedCampaignId={selectedCampaignId}
-        onSelectCampaign={setSelectedCampaignId}
-        onCampaignsPreviousPage={() => setEmailCampaignsPage((current) => Math.max(1, current - 1))}
-        onCampaignsNextPage={() => setEmailCampaignsPage((current) => current + 1)}
         isSendingCampaign={sendAdminEmailCampaignMutation.isPending}
         manualSearchQuery={manualSearchQuery}
         onManualSearchQueryChange={setManualSearchQuery}
@@ -86,7 +104,6 @@ export function AdminEmailView() {
           try {
             await sendAdminEmailCampaignMutation.mutateAsync(payload);
             toast({ title: 'Email campaign sent successfully' });
-            await Promise.all([emailCampaignsQuery.refetch(), emailDeliveryLogsQuery.refetch()]);
           } catch (error) {
             toast({
               title: error instanceof Error ? error.message : 'Unable to send email campaign',

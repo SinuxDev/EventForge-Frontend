@@ -26,7 +26,7 @@ export function AdminAuditView() {
   });
 
   return (
-    <>
+    <div className="space-y-5">
       <section className="rounded-2xl border border-border bg-card/80 p-6 backdrop-blur">
         <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
           Admin / Audit logs
@@ -50,6 +50,6 @@ export function AdminAuditView() {
         onPreviousPage={() => setAuditPage((current) => Math.max(1, current - 1))}
         onNextPage={() => setAuditPage((current) => current + 1)}
       />
-    </>
+    </div>
   );
 }

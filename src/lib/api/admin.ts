@@ -6,6 +6,8 @@ import type {
   AdminEmailCampaignResponse,
   AdminEmailCampaignsResponse,
   AdminEmailDeliveryLogsResponse,
+  AdminOverviewChartRange,
+  AdminOverviewChartsResponse,
   AdminAuditAction,
   AdminUserActionResponse,
   AdminUserRole,
@@ -200,4 +202,16 @@ export async function listAdminEmailDeliveryLogs(
       headers,
     }
   );
+}
+
+export async function getAdminOverviewCharts(
+  options: { range: AdminOverviewChartRange },
+  headers: AuthHeader
+) {
+  const query = new URLSearchParams();
+  query.set('range', options.range);
+
+  return apiClient.get<AdminOverviewChartsResponse>(`/admin/overview/charts?${query.toString()}`, {
+    headers,
+  });
 }

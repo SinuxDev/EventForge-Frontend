@@ -214,3 +214,34 @@ export interface AdminEmailDeliveryLogsResponse {
     pagination: PaginationPayload;
   };
 }
+
+export type AdminOverviewChartRange = '7d' | '30d' | '90d';
+
+export interface AdminOverviewCharts {
+  roleDistribution: {
+    attendee: number;
+    organizer: number;
+    admin: number;
+  };
+  complianceSeverity: {
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+  };
+  emailDeliveryTrend: Array<{
+    date: string;
+    sent: number;
+    failed: number;
+  }>;
+  meta: {
+    range: AdminOverviewChartRange;
+    generatedAt: string;
+  };
+}
+
+export interface AdminOverviewChartsResponse {
+  success: boolean;
+  message: string;
+  data: AdminOverviewCharts;
+}

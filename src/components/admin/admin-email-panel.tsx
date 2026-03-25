@@ -185,7 +185,7 @@ export function AdminEmailPanel({
 
         {audienceMode === 'segment' ? (
           <div className="md:col-span-2">
-            <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground">Target roles</p>
+            <p className="text-xs uppercase tracking-widest  text-muted-foreground">Target roles</p>
             <div className="mt-2 flex flex-wrap gap-2">
               {(['attendee', 'organizer', 'admin'] as const).map((role) => (
                 <button
@@ -204,7 +204,7 @@ export function AdminEmailPanel({
           </div>
         ) : (
           <div className="md:col-span-2">
-            <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground">
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">
               Selected users
             </p>
             <div className="mt-2 grid gap-2 md:grid-cols-[1fr_auto]">

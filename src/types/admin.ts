@@ -4,7 +4,10 @@ export type AdminAuditAction =
   | 'user.suspension.updated'
   | 'compliance.case.created'
   | 'compliance.case.status.updated'
-  | 'admin.email.campaign.sent';
+  | 'admin.email.campaign.sent'
+  | 'demo.request.assigned'
+  | 'demo.request.status.updated'
+  | 'demo.request.followup.updated';
 
 export type ComplianceCaseSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type ComplianceCaseStatus = 'open' | 'in_review' | 'actioned' | 'resolved';
@@ -244,4 +247,86 @@ export interface AdminOverviewChartsResponse {
   success: boolean;
   message: string;
   data: AdminOverviewCharts;
+}
+
+export type DemoRequestSource = 'public-website' | 'authenticated-website';
+export type DemoRequestStatus =
+  | 'new'
+  | 'contacted'
+  | 'qualified'
+  | 'unqualified'
+  | 'scheduled'
+  | 'completed'
+  | 'no_show'
+  | 'won'
+  | 'lost'
+  | 'nurture';
+export type DemoRequestPriority = 'low' | 'medium' | 'high';
+
+export interface DemoRequestItem {
+  _id: string;
+  fullName: string;
+  workEmail: string;
+  company: string;
+  role: string;
+  teamSize: string;
+  useCase: string;
+  source: DemoRequestSource;
+  status: DemoRequestStatus;
+  priority: DemoRequestPriority;
+  ownerAdminId?: {
+    _id: string;
+    name: string;
+    email: string;
+    role: AdminUserRole;
+  };
+  qualificationNotes?: string;
+  firstResponseAt?: string;
+  scheduledAt?: string;
+  lastContactAt?: string;
+  nextActionAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ListDemoRequestsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    data: DemoRequestItem[];
+    pagination: PaginationPayload;
+  };
+}
+
+export interface DemoRequestResponse {
+  success: boolean;
+  message: string;
+  data: DemoRequestItem;
+}
+
+export interface DemoRequestAnalyticsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    summary: {
+      total: number;
+      newCount: number;
+      scheduledCount: number;
+      completedCount: number;
+      wonCount: number;
+      noShowCount: number;
+      qualificationRate: number;
+      scheduleRate: number;
+      winRate: number;
+      noShowRate: number;
+      medianFirstResponseMinutes: number;
+      slaBreachedCount: number;
+    };
+    statusDistribution: Record<DemoRequestStatus, number>;
+    volumeTrend: Array<{ date: string; count: number }>;
+    meta: {
+      range: '7d' | '30d' | '90d';
+      generatedAt: string;
+    };
+  };
 }

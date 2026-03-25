@@ -32,6 +32,18 @@ function getActionLabel(action: AdminAuditAction): string {
     return 'Admin email campaign sent';
   }
 
+  if (action === 'demo.request.assigned') {
+    return 'Demo request assigned';
+  }
+
+  if (action === 'demo.request.status.updated') {
+    return 'Demo request status changed';
+  }
+
+  if (action === 'demo.request.followup.updated') {
+    return 'Demo request follow-up updated';
+  }
+
   return 'Suspension updated';
 }
 
@@ -85,6 +97,11 @@ export function AdminAuditLogList({
               Compliance case status changed
             </SelectItem>
             <SelectItem value="admin.email.campaign.sent">Admin email campaign sent</SelectItem>
+            <SelectItem value="demo.request.assigned">Demo request assigned</SelectItem>
+            <SelectItem value="demo.request.status.updated">Demo request status changed</SelectItem>
+            <SelectItem value="demo.request.followup.updated">
+              Demo request follow-up updated
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -8,6 +8,12 @@ import type {
   AdminEmailDeliveryLogsResponse,
   AdminOverviewChartRange,
   AdminOverviewChartsResponse,
+  DemoRequestAnalyticsResponse,
+  DemoRequestResponse,
+  DemoRequestStatus,
+  DemoRequestPriority,
+  DemoRequestSource,
+  ListDemoRequestsResponse,
   AdminAuditAction,
   AdminUserActionResponse,
   AdminUserRole,
@@ -214,4 +220,120 @@ export async function getAdminOverviewCharts(
   return apiClient.get<AdminOverviewChartsResponse>(`/admin/overview/charts?${query.toString()}`, {
     headers,
   });
+}
+
+interface ListDemoRequestsOptions {
+  page: number;
+  limit: number;
+  q?: string;
+  status?: DemoRequestStatus;
+  priority?: DemoRequestPriority;
+  ownerAdminId?: string;
+  source?: DemoRequestSource;
+  from?: string;
+  to?: string;
+  sla?: 'all' | 'on_time' | 'overdue';
+}
+
+export async function listAdminDemoRequests(options: ListDemoRequestsOptions, headers: AuthHeader) {
+  const query = new URLSearchParams();
+  query.set('page', String(options.page));
+  query.set('limit', String(options.limit));
+
+  if (options.q?.trim()) {
+    query.set('q', options.q.trim());
+  }
+
+  if (options.status) {
+    query.set('status', options.status);
+  }
+
+  if (options.priority) {
+    query.set('priority', options.priority);
+  }
+
+  if (options.ownerAdminId) {
+    query.set('ownerAdminId', options.ownerAdminId);
+  }
+
+  if (options.source) {
+    query.set('source', options.source);
+  }
+
+  if (options.from) {
+    query.set('from', options.from);
+  }
+
+  if (options.to) {
+    query.set('to', options.to);
+  }
+
+  if (options.sla) {
+    query.set('sla', options.sla);
+  }
+
+  return apiClient.get<ListDemoRequestsResponse>(`/admin/demo-requests?${query.toString()}`, {
+    headers,
+  });
+}
+
+export async function getAdminDemoRequestById(id: string, headers: AuthHeader) {
+  return apiClient.get<DemoRequestResponse>(`/admin/demo-requests/${id}`, { headers });
+}
+
+export async function assignAdminDemoRequestOwner(
+  id: string,
+  payload: { ownerAdminId: string; reason: string },
+  headers: AuthHeader
+) {
+  return apiClient.patch<DemoRequestResponse>(`/admin/demo-requests/${id}/assign`, payload, {
+    headers,
+  });
+}
+
+export async function updateAdminDemoRequestStatus(
+  id: string,
+  payload: {
+    status: DemoRequestStatus;
+    reason: string;
+    qualificationNotes?: string;
+    scheduledAt?: string;
+    nextActionAt?: string;
+  },
+  headers: AuthHeader
+) {
+  return apiClient.patch<DemoRequestResponse>(`/admin/demo-requests/${id}/status`, payload, {
+    headers,
+  });
+}
+
+export async function updateAdminDemoRequestFollowUp(
+  id: string,
+  payload: {
+    reason: string;
+    lastContactAt?: string;
+    nextActionAt?: string;
+    qualificationNotes?: string;
+    priority?: DemoRequestPriority;
+  },
+  headers: AuthHeader
+) {
+  return apiClient.patch<DemoRequestResponse>(`/admin/demo-requests/${id}/follow-up`, payload, {
+    headers,
+  });
+}
+
+export async function getAdminDemoRequestAnalytics(
+  options: { range: '7d' | '30d' | '90d' },
+  headers: AuthHeader
+) {
+  const query = new URLSearchParams();
+  query.set('range', options.range);
+
+  return apiClient.get<DemoRequestAnalyticsResponse>(
+    `/admin/demo-requests/analytics?${query.toString()}`,
+    {
+      headers,
+    }
+  );
 }

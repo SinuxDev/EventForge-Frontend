@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { AdminDemoRequestAnalytics } from '@/components/admin/admin-demo-request-analytics';
+import { AdminDemoReplyDialog } from '@/components/admin/admin-demo-reply-dialog';
 import { AdminDemoRequestsTable } from '@/components/admin/admin-demo-requests-table';
 import {
   useAdminDemoRequestAnalytics,
@@ -8,10 +9,16 @@ import {
 } from '@/hooks/use-admin-demo-requests';
 import {
   useUpdateAdminDemoRequestFollowUp,
+  useSendAdminDemoRequestReply,
   useUpdateAdminDemoRequestStatus,
 } from '@/hooks/use-admin-demo-request-actions';
 import { toast } from '@/hooks/use-toast';
-import type { DemoRequestPriority, DemoRequestSource, DemoRequestStatus } from '@/types/admin';
+import type {
+  DemoRequestItem,
+  DemoRequestPriority,
+  DemoRequestSource,
+  DemoRequestStatus,
+} from '@/types/admin';
 
 export function AdminDemoRequestsView() {
   const { data: session } = useSession();
@@ -22,6 +29,7 @@ export function AdminDemoRequestsView() {
   const [priorityFilter, setPriorityFilter] = useState<'all' | DemoRequestPriority>('all');
   const [sourceFilter, setSourceFilter] = useState<'all' | DemoRequestSource>('all');
   const [slaFilter, setSlaFilter] = useState<'all' | 'on_time' | 'overdue'>('all');
+  const [replyDialogRequest, setReplyDialogRequest] = useState<DemoRequestItem | null>(null);
 
   const authHeader = useMemo(() => {
     if (!session?.accessToken) {
@@ -46,6 +54,7 @@ export function AdminDemoRequestsView() {
 
   const updateStatusMutation = useUpdateAdminDemoRequestStatus(authHeader);
   const updateFollowUpMutation = useUpdateAdminDemoRequestFollowUp(authHeader);
+  const sendReplyMutation = useSendAdminDemoRequestReply(authHeader);
 
   return (
     <div className="space-y-5">
@@ -195,8 +204,28 @@ export function AdminDemoRequestsView() {
             });
           }
         }}
+        onOpenReplyDialog={(request) => setReplyDialogRequest(request)}
         onPreviousPage={() => setPage((current) => Math.max(1, current - 1))}
         onNextPage={() => setPage((current) => current + 1)}
+      />
+
+      <AdminDemoReplyDialog
+        request={replyDialogRequest}
+        isSubmitting={sendReplyMutation.isPending}
+        onClose={() => setReplyDialogRequest(null)}
+        onSubmit={async (payload) => {
+          try {
+            await sendReplyMutation.mutateAsync(payload);
+            toast({ title: 'Demo reply sent' });
+            setReplyDialogRequest(null);
+            await Promise.all([listQuery.refetch(), analyticsQuery.refetch()]);
+          } catch (error) {
+            toast({
+              title: error instanceof Error ? error.message : 'Unable to send demo reply',
+              variant: 'destructive',
+            });
+          }
+        }}
       />
     </div>
   );

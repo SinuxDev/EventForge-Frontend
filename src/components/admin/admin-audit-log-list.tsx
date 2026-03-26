@@ -44,6 +44,10 @@ function getActionLabel(action: AdminAuditAction): string {
     return 'Demo request follow-up updated';
   }
 
+  if (action === 'demo.request.reply.sent') {
+    return 'Demo request reply sent';
+  }
+
   return 'Suspension updated';
 }
 
@@ -102,6 +106,7 @@ export function AdminAuditLogList({
             <SelectItem value="demo.request.followup.updated">
               Demo request follow-up updated
             </SelectItem>
+            <SelectItem value="demo.request.reply.sent">Demo request reply sent</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -9,6 +9,7 @@ import type {
   AdminOverviewChartRange,
   AdminOverviewChartsResponse,
   DemoRequestAnalyticsResponse,
+  DemoReplyTemplateKey,
   DemoRequestResponse,
   DemoRequestStatus,
   DemoRequestPriority,
@@ -279,6 +280,21 @@ export async function listAdminDemoRequests(options: ListDemoRequestsOptions, he
 
 export async function getAdminDemoRequestById(id: string, headers: AuthHeader) {
   return apiClient.get<DemoRequestResponse>(`/admin/demo-requests/${id}`, { headers });
+}
+
+export async function sendAdminDemoRequestReply(
+  id: string,
+  payload: {
+    templateKey: DemoReplyTemplateKey;
+    reason: string;
+    customMessage?: string;
+    scheduleLink?: string;
+  },
+  headers: AuthHeader
+) {
+  return apiClient.post<DemoRequestResponse>(`/admin/demo-requests/${id}/reply`, payload, {
+    headers,
+  });
 }
 
 export async function assignAdminDemoRequestOwner(

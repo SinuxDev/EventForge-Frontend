@@ -7,7 +7,8 @@ export type AdminAuditAction =
   | 'admin.email.campaign.sent'
   | 'demo.request.assigned'
   | 'demo.request.status.updated'
-  | 'demo.request.followup.updated';
+  | 'demo.request.followup.updated'
+  | 'demo.request.reply.sent';
 
 export type ComplianceCaseSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type ComplianceCaseStatus = 'open' | 'in_review' | 'actioned' | 'resolved';
@@ -262,6 +263,11 @@ export type DemoRequestStatus =
   | 'lost'
   | 'nurture';
 export type DemoRequestPriority = 'low' | 'medium' | 'high';
+export type DemoReplyTemplateKey =
+  | 'acknowledgement'
+  | 'qualified_next_steps'
+  | 'not_a_fit_polite'
+  | 'reschedule_no_show';
 
 export interface DemoRequestItem {
   _id: string;
@@ -281,6 +287,10 @@ export interface DemoRequestItem {
     role: AdminUserRole;
   };
   qualificationNotes?: string;
+  acknowledgementSentAt?: string;
+  lastReplySentAt?: string;
+  lastReplyTemplateKey?: DemoReplyTemplateKey;
+  replyCount: number;
   firstResponseAt?: string;
   scheduledAt?: string;
   lastContactAt?: string;
@@ -302,6 +312,13 @@ export interface DemoRequestResponse {
   success: boolean;
   message: string;
   data: DemoRequestItem;
+}
+
+export interface SendDemoRequestReplyPayload {
+  templateKey: DemoReplyTemplateKey;
+  reason: string;
+  customMessage?: string;
+  scheduleLink?: string;
 }
 
 export interface DemoRequestAnalyticsResponse {

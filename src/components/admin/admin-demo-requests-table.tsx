@@ -20,6 +20,7 @@ interface AdminDemoRequestsTableProps {
     reason: string;
     priority?: DemoRequestPriority;
   }) => Promise<void>;
+  onOpenReplyDialog: (request: DemoRequestItem) => void;
   onPreviousPage: () => void;
   onNextPage: () => void;
 }
@@ -30,6 +31,7 @@ export function AdminDemoRequestsTable({
   isLoading,
   onUpdateStatus,
   onUpdateFollowUp,
+  onOpenReplyDialog,
   onPreviousPage,
   onNextPage,
 }: AdminDemoRequestsTableProps) {
@@ -97,6 +99,13 @@ export function AdminDemoRequestsTable({
                   className="h-8 rounded-md border border-border bg-background/80 px-2.5 text-xs font-semibold text-foreground transition hover:border-ring/35 hover:bg-muted"
                 >
                   Mark scheduled
+                </button>
+
+                <button
+                  onClick={() => onOpenReplyDialog(request)}
+                  className="h-8 rounded-md border border-primary/40 bg-primary/15 px-2.5 text-xs font-semibold text-primary transition hover:border-primary/60 hover:bg-primary/20"
+                >
+                  Send reply
                 </button>
 
                 <button

@@ -185,6 +185,15 @@ export default function Home() {
             <Link href="/events" className="hidden transition hover:text-foreground sm:inline">
               Explore Events ↗
             </Link>
+            <Link href="/policy" className="hidden transition hover:text-foreground md:inline">
+              Policy
+            </Link>
+            <Link href="/help" className="hidden transition hover:text-foreground md:inline">
+              Help
+            </Link>
+            <Link href="/appeal" className="hidden transition hover:text-foreground md:inline">
+              Appeal
+            </Link>
             <ThemeToggle />
             {status === 'loading' ? (
               <button
@@ -247,6 +256,36 @@ export default function Home() {
               >
                 Book Demo
               </button>
+            </div>
+
+            <div className="rounded-xl border border-primary/30 bg-linear-to-r from-primary/10 via-card/90 to-accent/10 p-3.5 backdrop-blur">
+              <p className="text-xs uppercase tracking-[0.14em] text-primary">
+                Email notice support
+              </p>
+              <p className="mt-1 text-sm text-foreground">
+                Got a warning or suspension email from EventForge? Check Help first, then submit an
+                appeal if needed.
+              </p>
+              <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                <Link
+                  href="/help"
+                  className="rounded-lg border border-border bg-background/80 px-3 py-1.5 text-xs font-semibold text-foreground transition hover:border-ring/35 hover:bg-muted"
+                >
+                  Open Help
+                </Link>
+                <Link
+                  href="/appeal"
+                  className="rounded-lg border border-primary/40 bg-primary/15 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/20"
+                >
+                  Submit Appeal
+                </Link>
+                <Link
+                  href="/policy"
+                  className="text-xs font-medium text-muted-foreground underline-offset-2 transition hover:text-foreground hover:underline"
+                >
+                  Review policy
+                </Link>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-muted-foreground">

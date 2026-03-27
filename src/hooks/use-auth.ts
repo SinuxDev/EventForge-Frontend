@@ -1,9 +1,15 @@
 // ─── TanStack Query hooks — Auth ─────────────────────────────────────────────
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import { useAuthStore } from "@/stores/auth-store";
-import type { User, ApiResponse } from "@/types";
-import type { RegisterInput, LoginInput, ForgotPasswordInput, ResetPasswordInput } from "@/lib/schemas";
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useSession } from 'next-auth/react';
+import { apiClient } from '@/lib/api-client';
+import { useAuthStore } from '@/stores/auth-store';
+import type { User, ApiResponse } from '@/types';
+import type {
+  RegisterInput,
+  LoginInput,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+} from '@/lib/schemas';
 
 interface AuthTokens {
   accessToken: string;
@@ -13,11 +19,13 @@ interface AuthTokens {
 
 // ─── Current user ─────────────────────────────────────────────────────────────
 export function useCurrentUser() {
-  const { accessToken } = useAuthStore();
+  const { data: session } = useSession();
+  const accessToken = session?.accessToken;
+
   return useQuery({
-    queryKey: ["auth", "me"],
+    queryKey: ['auth', 'me'],
     queryFn: () =>
-      apiClient.get<ApiResponse<User>>("/auth/me", {
+      apiClient.get<ApiResponse<User>>('/auth/me', {
         headers: { Authorization: `Bearer ${accessToken}` },
       }),
     enabled: Boolean(accessToken),
@@ -26,26 +34,23 @@ export function useCurrentUser() {
 
 // ─── Register ─────────────────────────────────────────────────────────────────
 export function useRegister() {
-  const { setUser, setAccessToken } = useAuthStore();
+  const { setUser } = useAuthStore();
   return useMutation({
-    mutationFn: (data: Omit<RegisterInput, "confirmPassword">) =>
-      apiClient.post<ApiResponse<AuthTokens>>("/auth/register", data),
+    mutationFn: (data: Omit<RegisterInput, 'confirmPassword'>) =>
+      apiClient.post<ApiResponse<AuthTokens>>('/auth/register', data),
     onSuccess: ({ data }) => {
       setUser(data.user);
-      setAccessToken(data.accessToken);
     },
   });
 }
 
 // ─── Login ────────────────────────────────────────────────────────────────────
 export function useLogin() {
-  const { setUser, setAccessToken } = useAuthStore();
+  const { setUser } = useAuthStore();
   return useMutation({
-    mutationFn: (data: LoginInput) =>
-      apiClient.post<ApiResponse<AuthTokens>>("/auth/login", data),
+    mutationFn: (data: LoginInput) => apiClient.post<ApiResponse<AuthTokens>>('/auth/login', data),
     onSuccess: ({ data }) => {
       setUser(data.user);
-      setAccessToken(data.accessToken);
     },
   });
 }
@@ -54,14 +59,14 @@ export function useLogin() {
 export function useForgotPassword() {
   return useMutation({
     mutationFn: (data: ForgotPasswordInput) =>
-      apiClient.post<ApiResponse<null>>("/auth/forgot-password", data),
+      apiClient.post<ApiResponse<null>>('/auth/forgot-password', data),
   });
 }
 
 // ─── Reset password ───────────────────────────────────────────────────────────
 export function useResetPassword(token: string) {
   return useMutation({
-    mutationFn: (data: Pick<ResetPasswordInput, "password">) =>
-      apiClient.post<ApiResponse<null>>("/auth/reset-password", { ...data, token }),
+    mutationFn: (data: Pick<ResetPasswordInput, 'password'>) =>
+      apiClient.post<ApiResponse<null>>('/auth/reset-password', { ...data, token }),
   });
 }

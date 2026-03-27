@@ -14,7 +14,6 @@ interface UpgradeRoleResponse {
       role: 'attendee' | 'organizer' | 'admin';
     };
     accessToken: string;
-    refreshToken: string;
   };
 }
 
@@ -57,7 +56,6 @@ export function RoleUpgradeCard({
           role: result.data.user.role,
         },
         accessToken: result.data.accessToken,
-        refreshToken: result.data.refreshToken,
       });
 
       toast({ title: 'Organizer access enabled' });

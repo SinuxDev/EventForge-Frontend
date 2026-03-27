@@ -38,7 +38,6 @@ interface SessionUpdatePayload {
     role?: 'attendee' | 'organizer' | 'admin';
   };
   accessToken?: string;
-  refreshToken?: string;
 }
 
 const API_BASE_URL =
@@ -177,10 +176,6 @@ export const authOptions: NextAuthOptions = {
         if (payload.accessToken) {
           token.accessToken = payload.accessToken;
         }
-
-        if (payload.refreshToken) {
-          token.refreshToken = payload.refreshToken;
-        }
       }
 
       return token;
@@ -193,7 +188,6 @@ export const authOptions: NextAuthOptions = {
       }
 
       session.accessToken = (token.accessToken as string | undefined) ?? undefined;
-      session.refreshToken = (token.refreshToken as string | undefined) ?? undefined;
 
       return session;
     },

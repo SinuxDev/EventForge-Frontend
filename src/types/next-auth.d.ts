@@ -9,7 +9,6 @@ declare module 'next-auth' {
       role: UserRole;
     } & DefaultSession['user'];
     accessToken?: string;
-    refreshToken?: string;
   }
 
   interface User {

@@ -185,15 +185,6 @@ export default function Home() {
             <Link href="/events" className="hidden transition hover:text-foreground sm:inline">
               Explore Events ↗
             </Link>
-            <Link href="/policy" className="hidden transition hover:text-foreground md:inline">
-              Policy
-            </Link>
-            <Link href="/help" className="hidden transition hover:text-foreground md:inline">
-              Help
-            </Link>
-            <Link href="/appeal" className="hidden transition hover:text-foreground md:inline">
-              Appeal
-            </Link>
             <ThemeToggle />
             {status === 'loading' ? (
               <button

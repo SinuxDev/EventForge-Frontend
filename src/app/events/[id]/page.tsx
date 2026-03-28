@@ -7,6 +7,7 @@ import { CalendarClock, CircleDot, MapPin, Ticket } from 'lucide-react';
 import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { usePublicEvent } from '@/hooks/use-public-events';
 import { toPublicMediaUrl } from '@/lib/media-url';
+import { RsvpActionCard } from '@/components/events/rsvp-action-card';
 
 function formatEventDate(value: string, timezone: string): string {
   const date = new Date(value);
@@ -155,6 +156,8 @@ export default function PublicEventDetailPage() {
                 </Link>
               </div>
             </article>
+
+            <RsvpActionCard eventId={event._id} eventTitle={event.title} />
           </section>
         </div>
       </main>

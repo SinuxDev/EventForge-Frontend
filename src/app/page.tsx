@@ -181,7 +181,9 @@ export default function Home() {
           </a>
 
           <div className="flex items-center gap-3 text-xs text-muted-foreground sm:gap-4 sm:text-sm">
-            <span className="hidden sm:inline">{timezoneLabel}</span>
+            <span className="hidden sm:inline" suppressHydrationWarning>
+              {timezoneLabel}
+            </span>
             <Link href="/events" className="hidden transition hover:text-foreground sm:inline">
               Explore Events ↗
             </Link>

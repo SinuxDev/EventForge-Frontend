@@ -30,7 +30,7 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
     title: 'Attendee workspace',
     items: [
       { href: '/dashboard/attendee', label: 'Overview', icon: LayoutDashboard },
-      { href: '/', label: 'Discover events', icon: Compass },
+      { href: '/events', label: 'Discover events', icon: Compass },
       { href: '/book-demo', label: 'Book demo', icon: LifeBuoy },
     ],
   },

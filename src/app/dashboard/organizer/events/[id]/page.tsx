@@ -152,6 +152,12 @@ export default function OrganizerEventDetailPage() {
                       Edit event
                     </Link>
                     <Link
+                      href={`/dashboard/organizer/events/${event._id}/check-in`}
+                      className="inline-flex h-9 items-center rounded-lg border border-primary/40 bg-primary/12 px-4 text-sm font-medium text-primary"
+                    >
+                      Open check-in scanner
+                    </Link>
+                    <Link
                       href="/dashboard/organizer"
                       className="inline-flex h-9 items-center rounded-lg border border-border bg-background/80 px-4 text-sm font-medium text-foreground"
                     >

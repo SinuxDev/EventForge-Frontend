@@ -12,6 +12,20 @@ interface UploadCoverResponse {
   fileName: string;
 }
 
+export interface SubmitRsvpPayload {
+  formResponses?: Array<{
+    question: string;
+    answer: string;
+  }>;
+}
+
+export interface SubmitRsvpResult {
+  rsvpId: string;
+  status: 'registered' | 'waitlisted' | 'cancelled';
+  waitlistPosition: number | null;
+  ticketId: string | null;
+}
+
 export interface PaginatedEvents {
   data: EventEntity[];
   pagination: {
@@ -164,6 +178,24 @@ export async function listPublicEvents(
 
 export async function getPublicEventById(eventId: string): Promise<EventEntity> {
   const response = await apiClient.get<ApiEnvelope<EventEntity>>(`/events/public/${eventId}`);
+  return response.data;
+}
+
+export async function submitRsvp(
+  eventId: string,
+  payload: SubmitRsvpPayload,
+  accessToken: string
+): Promise<SubmitRsvpResult> {
+  const response = await apiClient.post<ApiEnvelope<SubmitRsvpResult>>(
+    `/events/${eventId}/rsvp`,
+    payload,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
   return response.data;
 }
 

@@ -6,11 +6,15 @@ const connectSrc = ["'self'", 'https:', 'ws:', 'wss:', ...(isDevelopment ? ['htt
   ' '
 );
 
+const imgSrc = ["'self'", 'data:', 'blob:', 'https:', ...(isDevelopment ? ['http:'] : [])].join(
+  ' '
+);
+
 const cspDirectives = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ''}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
+  `img-src ${imgSrc}`,
   "font-src 'self' data:",
   `connect-src ${connectSrc}`,
   "frame-ancestors 'none'",

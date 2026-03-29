@@ -184,6 +184,12 @@ export default function Home() {
             <span className="hidden sm:inline" suppressHydrationWarning>
               {timezoneLabel}
             </span>
+            <Link
+              href="/events"
+              className="inline-flex h-9 items-center rounded-full border border-border bg-card/80 px-3 text-xs font-medium text-foreground transition hover:border-ring/35 hover:bg-muted sm:hidden"
+            >
+              Explore
+            </Link>
             <Link href="/events" className="hidden transition hover:text-foreground sm:inline">
               Explore Events ↗
             </Link>

@@ -5,6 +5,7 @@ import {
   LifeBuoy,
   Mail,
   Megaphone,
+  Rows2,
   PlusSquare,
   Rows3,
   ScrollText,
@@ -30,6 +31,7 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
     title: 'Attendee workspace',
     items: [
       { href: '/dashboard/attendee', label: 'Overview', icon: LayoutDashboard },
+      { href: '/dashboard/attendee/events', label: 'My events', icon: Rows2 },
       { href: '/events', label: 'Discover events', icon: Compass },
       { href: '/book-demo', label: 'Book demo', icon: LifeBuoy },
     ],

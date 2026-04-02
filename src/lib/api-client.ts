@@ -1,9 +1,9 @@
 // ─── API Client ───────────────────────────────────────────────────────────────
 // Centralised fetch wrapper — all API calls go through here.
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api';
 
-type RequestOptions = Omit<RequestInit, "body"> & {
+type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown;
 };
 
@@ -13,7 +13,7 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
   const config: RequestInit = {
     ...rest,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...(headers as Record<string, string>),
     },
     ...(body !== undefined && { body: JSON.stringify(body) }),
@@ -31,17 +31,17 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
 export const apiClient = {
   get: <T>(endpoint: string, options?: RequestOptions) =>
-    request<T>(endpoint, { ...options, method: "GET" }),
+    request<T>(endpoint, { ...options, method: 'GET' }),
 
   post: <T>(endpoint: string, body: unknown, options?: RequestOptions) =>
-    request<T>(endpoint, { ...options, method: "POST", body }),
+    request<T>(endpoint, { ...options, method: 'POST', body }),
 
   put: <T>(endpoint: string, body: unknown, options?: RequestOptions) =>
-    request<T>(endpoint, { ...options, method: "PUT", body }),
+    request<T>(endpoint, { ...options, method: 'PUT', body }),
 
   patch: <T>(endpoint: string, body: unknown, options?: RequestOptions) =>
-    request<T>(endpoint, { ...options, method: "PATCH", body }),
+    request<T>(endpoint, { ...options, method: 'PATCH', body }),
 
   delete: <T>(endpoint: string, options?: RequestOptions) =>
-    request<T>(endpoint, { ...options, method: "DELETE" }),
+    request<T>(endpoint, { ...options, method: 'DELETE' }),
 };

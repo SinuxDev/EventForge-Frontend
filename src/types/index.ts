@@ -2,7 +2,7 @@
 // All domain types used across the frontend live here.
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
-export type UserRole = "attendee" | "organizer" | "admin";
+export type UserRole = 'attendee' | 'organizer' | 'admin';
 
 export interface User {
   _id: string;
@@ -16,12 +16,12 @@ export interface User {
 }
 
 // ─── Events ───────────────────────────────────────────────────────────────────
-export type EventType = "in-person" | "online";
-export type EventStatus = "draft" | "published" | "cancelled";
+export type EventType = 'in-person' | 'online';
+export type EventStatus = 'draft' | 'published' | 'cancelled';
 
 export interface CustomQuestion {
   label: string;
-  type: "text" | "select" | "checkbox";
+  type: 'text' | 'select' | 'checkbox';
   options?: string[];
   required: boolean;
 }
@@ -58,7 +58,7 @@ export interface Event {
 }
 
 // ─── RSVPs ────────────────────────────────────────────────────────────────────
-export type RsvpStatus = "confirmed" | "waitlisted" | "cancelled";
+export type RsvpStatus = 'confirmed' | 'waitlisted' | 'cancelled';
 
 export interface FormResponse {
   question: string;

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { CalendarClock, CircleDot, MapPin, Ticket } from 'lucide-react';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
+import { OrganizerEventSubnav } from '@/components/events/organizer-event-subnav';
 import { useOrganizerEvents } from '@/hooks/use-organizer-events';
 import { toPublicMediaUrl } from '@/lib/media-url';
 
@@ -47,6 +48,8 @@ export default function OrganizerEventDetailPage() {
   return (
     <DashboardShell requiredRole="organizer">
       <section className="w-full space-y-6">
+        <OrganizerEventSubnav eventId={id} active="overview" />
+
         {eventsQuery.isLoading ? (
           <div className="rounded-xl border border-border bg-card/70 p-6 text-sm text-muted-foreground">
             Loading event details...
@@ -55,7 +58,7 @@ export default function OrganizerEventDetailPage() {
           <div className="rounded-xl border border-destructive/35 bg-destructive/10 p-6">
             <p className="text-sm text-destructive">Event not found in your organizer workspace.</p>
             <Link
-              href="/dashboard/organizer"
+              href="/dashboard/organizer/events"
               className="mt-4 inline-flex rounded-lg border border-border bg-background/80 px-4 py-2 text-sm font-medium text-foreground"
             >
               Back to My events
@@ -158,7 +161,13 @@ export default function OrganizerEventDetailPage() {
                       Open check-in scanner
                     </Link>
                     <Link
-                      href="/dashboard/organizer"
+                      href={`/dashboard/organizer/events/${event._id}/tickets`}
+                      className="inline-flex h-9 items-center rounded-lg border border-border bg-background/80 px-4 text-sm font-medium text-foreground"
+                    >
+                      Open tickets
+                    </Link>
+                    <Link
+                      href="/dashboard/organizer/events"
                       className="inline-flex h-9 items-center rounded-lg border border-border bg-background/80 px-4 text-sm font-medium text-foreground"
                     >
                       Back to My events

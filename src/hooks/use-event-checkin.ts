@@ -1,10 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { checkInByQr, getEventAttendance, undoEventCheckIn } from '@/lib/api/event-checkin';
+import {
+  checkInByQr,
+  getEventAttendance,
+  getEventAttendees,
+  undoEventCheckIn,
+  type EventAttendeesQueryParams,
+} from '@/lib/api/event-checkin';
 
 export const eventCheckInKeys = {
   all: ['event-checkin'] as const,
   attendance: (eventId: string, accessToken?: string) =>
     [...eventCheckInKeys.all, 'attendance', eventId, accessToken] as const,
+  attendees: (
+    eventId: string,
+    accessToken: string | undefined,
+    filters: EventAttendeesQueryParams
+  ) => [...eventCheckInKeys.all, 'attendees', eventId, accessToken, filters] as const,
 };
 
 export function useEventAttendance(eventId: string, accessToken?: string) {
@@ -51,6 +62,24 @@ export function useUndoCheckIn(eventId: string, accessToken?: string) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: eventCheckInKeys.all });
+    },
+  });
+}
+
+export function useEventAttendees(
+  eventId: string,
+  accessToken: string | undefined,
+  filters: EventAttendeesQueryParams
+) {
+  return useQuery({
+    queryKey: eventCheckInKeys.attendees(eventId, accessToken, filters),
+    enabled: Boolean(eventId) && Boolean(accessToken),
+    queryFn: async () => {
+      if (!accessToken) {
+        throw new Error('You must be signed in to view attendees');
+      }
+
+      return getEventAttendees(eventId, accessToken, filters);
     },
   });
 }

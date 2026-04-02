@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { useEffect, useRef, useState } from 'react';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
+import { OrganizerEventSubnav } from '@/components/events/organizer-event-subnav';
 import { useCheckInByQr, useEventAttendance, useUndoCheckIn } from '@/hooks/use-event-checkin';
 import { toast } from '@/hooks/use-toast';
 import type { CheckInResponse } from '@/lib/api/event-checkin';
@@ -159,6 +160,8 @@ export default function OrganizerCheckInPage() {
   return (
     <DashboardShell requiredRole="organizer">
       <section className="w-full space-y-6">
+        <OrganizerEventSubnav eventId={id} active="check-in" />
+
         <div className="rounded-2xl border border-border bg-card/80 p-6 backdrop-blur">
           <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
             Organizer / Event check-in
@@ -172,7 +175,7 @@ export default function OrganizerCheckInPage() {
               href={`/dashboard/organizer/events/${id}`}
               className="inline-flex h-9 items-center rounded-lg border border-border bg-background/80 px-4 text-sm font-medium text-foreground"
             >
-              Back to event details
+              Back to event overview
             </Link>
           </div>
         </div>

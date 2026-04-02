@@ -82,7 +82,7 @@ function getLocationLabel(event: EventEntity): string {
 export function OrganizerEventsPanel() {
   const { data: session } = useSession();
   const queryClient = useQueryClient();
-  const [view, setView] = useState<OrganizerEventsView>('upcoming');
+  const [view, setView] = useState<OrganizerEventsView>('all');
   const [status, setStatus] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
   const [nowDate] = useState(() => new Date());
@@ -129,7 +129,7 @@ export function OrganizerEventsPanel() {
   const filteredEvents = eventsQuery.data?.filtered ?? [];
 
   const clearFilters = () => {
-    setView('upcoming');
+    setView('all');
     setStatus('all');
     setSearch('');
   };
@@ -157,7 +157,7 @@ export function OrganizerEventsPanel() {
               Create Event
             </Link>
             <span className="rounded-full border border-border bg-background/70 px-3 py-1 text-xs text-muted-foreground">
-              Upcoming default
+              All events default
             </span>
           </div>
         </div>
@@ -267,7 +267,7 @@ export function OrganizerEventsPanel() {
               </div>
             </div>
           ) : (
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid gap-4 xl:grid-cols-3">
               {filteredEvents.map((event) => {
                 const isPublishing =
                   publishMutation.isPending && publishMutation.variables === event._id;
@@ -278,7 +278,7 @@ export function OrganizerEventsPanel() {
                     key={event._id}
                     className="group overflow-hidden rounded-2xl border border-border bg-card/90 shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-ring/35 hover:shadow-[0_14px_32px_rgba(0,0,0,0.1)]"
                   >
-                    <div className="relative aspect-video border-b border-border bg-muted/35">
+                    <div className="relative h-40 border-b border-border bg-muted/35">
                       {event.coverImage ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -302,7 +302,7 @@ export function OrganizerEventsPanel() {
                         </span>
                       </div>
 
-                      <div className="absolute right-3 top-3 text-xs">
+                      <div className="absolute right-3 top-3 text-[11px]">
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-2.5 py-1 text-white/90 backdrop-blur">
                           <CalendarClock className="h-3.5 w-3.5" />
                           {formatEventDate(event.startDateTime, event.timezone)}
@@ -310,12 +310,12 @@ export function OrganizerEventsPanel() {
                       </div>
                     </div>
 
-                    <div className="space-y-4 p-5">
-                      <div className="space-y-2">
-                        <h3 className="line-clamp-1 text-xl font-semibold text-foreground">
+                    <div className="space-y-3 p-4">
+                      <div className="space-y-1.5">
+                        <h3 className="line-clamp-1 text-lg font-semibold text-foreground">
                           {event.title}
                         </h3>
-                        <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">
+                        <p className="line-clamp-2 text-sm leading-5 text-muted-foreground">
                           {event.shortSummary}
                         </p>
                       </div>
@@ -331,7 +331,7 @@ export function OrganizerEventsPanel() {
                         </span>
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
                         <div className="flex flex-wrap items-center gap-2">
                           <Link
                             href={`/dashboard/organizer/events/${event._id}`}

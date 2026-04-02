@@ -39,8 +39,10 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
   organizer: {
     title: 'Organizer workspace',
     items: [
-      { href: '/dashboard/organizer', label: 'My events', icon: Rows3 },
+      { href: '/dashboard/organizer', label: 'Overview', icon: LayoutDashboard },
+      { href: '/dashboard/organizer/events', label: 'My events', icon: Rows3 },
       { href: '/events/new', label: 'Create event', icon: PlusSquare },
+      { href: '/dashboard/organizer/settings', label: 'Settings', icon: ScrollText },
       { href: '/book-demo', label: 'Support', icon: LifeBuoy },
     ],
   },

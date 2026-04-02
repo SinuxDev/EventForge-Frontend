@@ -48,7 +48,7 @@ function applyClientFilters(events: EventEntity[], filters: OrganizerEventsFilte
 
 export function useOrganizerEvents(accessToken?: string, filters?: OrganizerEventsFilters) {
   const resolvedFilters: OrganizerEventsFilters = filters ?? {
-    view: 'upcoming',
+    view: 'all',
     status: 'all',
     query: '',
   };

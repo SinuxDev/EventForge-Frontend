@@ -93,6 +93,69 @@ export interface ListAdminAuditLogsResponse {
   };
 }
 
+export interface AdminEventItem {
+  _id: string;
+  title: string;
+  shortSummary: string;
+  category: string;
+  startDateTime: string;
+  endDateTime: string;
+  status: 'draft' | 'published' | 'cancelled';
+  organizerName: string;
+  contactEmail: string;
+  organizerId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ListAdminEventsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    data: AdminEventItem[];
+    pagination: PaginationPayload;
+  };
+}
+
+export interface AdminEventDetail {
+  _id: string;
+  title: string;
+  shortSummary: string;
+  description: string;
+  category: string;
+  tags: string[];
+  coverImage?: string;
+  attendanceMode: 'in_person' | 'online' | 'hybrid';
+  venueName?: string;
+  city?: string;
+  country?: string;
+  onlineEventUrl?: string;
+  startDateTime: string;
+  endDateTime: string;
+  timezone: string;
+  capacity: number;
+  visibility: 'public' | 'unlisted' | 'private';
+  status: 'draft' | 'published' | 'cancelled';
+  organizerName: string;
+  organizerUrl?: string;
+  contactEmail: string;
+  tickets: Array<{
+    name: string;
+    type: 'free' | 'paid' | 'donation';
+    quantity: number;
+    price?: number;
+    currency?: string;
+  }>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminEventDetailResponse {
+  success: boolean;
+  message: string;
+  data: AdminEventDetail;
+}
+
 export interface ComplianceCase {
   _id: string;
   title: string;

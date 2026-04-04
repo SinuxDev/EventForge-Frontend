@@ -1,4 +1,5 @@
 import {
+  CalendarRange,
   Compass,
   History,
   LayoutDashboard,
@@ -51,6 +52,7 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
     items: [
       { href: '/dashboard/admin', label: 'Overview', icon: LayoutDashboard },
       { href: '/dashboard/admin/users', label: 'User governance', icon: Users },
+      { href: '/dashboard/admin/events', label: 'Events', icon: CalendarRange },
       { href: '/dashboard/admin/compliance', label: 'Compliance', icon: ShieldAlert },
       { href: '/dashboard/admin/demo-requests', label: 'Demo requests', icon: Megaphone },
       { href: '/dashboard/admin/email', label: 'Email center', icon: Mail },

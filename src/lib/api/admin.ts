@@ -16,12 +16,14 @@ import type {
   DemoRequestSource,
   ListDemoRequestsResponse,
   AdminAuditAction,
+  AdminEventDetailResponse,
   AdminUserActionResponse,
   AdminUserRole,
   ComplianceCaseResponse,
   ComplianceRiskOverviewResponse,
   ListComplianceCasesResponse,
   ListAdminAuditLogsResponse,
+  ListAdminEventsResponse,
   ListAdminUsersResponse,
 } from '@/types/admin';
 
@@ -39,6 +41,18 @@ interface ListAdminAuditLogsOptions {
   page: number;
   limit: number;
   action?: AdminAuditAction;
+}
+
+interface ListAdminEventsOptions {
+  page: number;
+  limit: number;
+  q?: string;
+  organizer?: string;
+  organizerId?: string;
+  status?: 'draft' | 'published' | 'cancelled';
+  startDateFrom?: string;
+  startDateTo?: string;
+  sort?: 'start_asc' | 'start_desc' | 'created_desc';
 }
 
 export async function listAdminUsers(options: ListAdminUsersOptions, headers: AuthHeader) {
@@ -73,6 +87,46 @@ export async function listAdminAuditLogs(options: ListAdminAuditLogsOptions, hea
   return apiClient.get<ListAdminAuditLogsResponse>(`/admin/audit-logs?${query.toString()}`, {
     headers,
   });
+}
+
+export async function listAdminEvents(options: ListAdminEventsOptions, headers: AuthHeader) {
+  const query = new URLSearchParams();
+  query.set('page', String(options.page));
+  query.set('limit', String(options.limit));
+
+  if (options.q?.trim()) {
+    query.set('q', options.q.trim());
+  }
+
+  if (options.organizer?.trim()) {
+    query.set('organizer', options.organizer.trim());
+  }
+
+  if (options.organizerId) {
+    query.set('organizerId', options.organizerId);
+  }
+
+  if (options.status) {
+    query.set('status', options.status);
+  }
+
+  if (options.startDateFrom) {
+    query.set('startDateFrom', options.startDateFrom);
+  }
+
+  if (options.startDateTo) {
+    query.set('startDateTo', options.startDateTo);
+  }
+
+  if (options.sort) {
+    query.set('sort', options.sort);
+  }
+
+  return apiClient.get<ListAdminEventsResponse>(`/admin/events?${query.toString()}`, { headers });
+}
+
+export async function getAdminEventById(eventId: string, headers: AuthHeader) {
+  return apiClient.get<AdminEventDetailResponse>(`/admin/events/${eventId}`, { headers });
 }
 
 export async function updateAdminUserRole(

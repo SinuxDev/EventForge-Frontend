@@ -25,6 +25,7 @@ const cspDirectives = [
 ].join('; ');
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   async headers() {
     const securityHeaders = [
       {

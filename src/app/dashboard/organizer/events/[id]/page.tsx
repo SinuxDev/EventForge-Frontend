@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useState } from 'react';
 import { CalendarClock, CircleDot, MapPin, Ticket } from 'lucide-react';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { OrganizerEventSubnav } from '@/components/events/organizer-event-subnav';
+import { toast } from '@/hooks/use-toast';
+import { downloadEventAttendeesCsv } from '@/lib/api/event-checkin';
 import { useOrganizerEvents } from '@/hooks/use-organizer-events';
 import { toPublicMediaUrl } from '@/lib/media-url';
 
@@ -36,6 +39,7 @@ function getLocationLabel(attendanceMode: string, venueName?: string, city?: str
 export default function OrganizerEventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: session } = useSession();
+  const [isExporting, setIsExporting] = useState(false);
 
   const eventsQuery = useOrganizerEvents(session?.accessToken, {
     view: 'all',
@@ -44,6 +48,48 @@ export default function OrganizerEventDetailPage() {
   });
 
   const event = eventsQuery.data?.data.find((item) => item._id === id);
+
+  const handleExportCsv = async () => {
+    if (!session?.accessToken) {
+      toast({
+        title: 'Session expired',
+        description: 'Please sign in again to export attendees.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setIsExporting(true);
+      const blob = await downloadEventAttendeesCsv(id, session.accessToken, {
+        status: 'all',
+        checkIn: 'all',
+        query: '',
+      });
+
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = downloadUrl;
+      anchor.download = `event-attendees-${id}.csv`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast({
+        title: 'Export started',
+        description: 'Your attendees CSV has been downloaded.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Export failed',
+        description: error instanceof Error ? error.message : 'Unable to export attendees.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <DashboardShell requiredRole="organizer">
@@ -166,6 +212,14 @@ export default function OrganizerEventDetailPage() {
                     >
                       Open tickets
                     </Link>
+                    <button
+                      type="button"
+                      onClick={() => void handleExportCsv()}
+                      disabled={isExporting}
+                      className="inline-flex h-9 items-center rounded-lg border border-border bg-background/80 px-4 text-sm font-medium text-foreground transition hover:border-ring/35 hover:bg-muted disabled:opacity-60"
+                    >
+                      {isExporting ? 'Exporting...' : 'Export attendees CSV'}
+                    </button>
                     <Link
                       href="/dashboard/organizer/events"
                       className="inline-flex h-9 items-center rounded-lg border border-border bg-background/80 px-4 text-sm font-medium text-foreground"

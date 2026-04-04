@@ -210,3 +210,34 @@ export async function downloadEventAttendeesCsv(
 
   return response.blob();
 }
+
+export async function downloadBulkEventAttendeesXlsx(
+  eventIds: string[],
+  accessToken: string,
+  filters: Pick<EventAttendeesQueryParams, 'status' | 'checkIn' | 'query'>
+): Promise<Blob> {
+  const configuredBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api/v1';
+  const trimmedBaseUrl = configuredBaseUrl.replace(/\/$/, '');
+  const apiBaseUrl = /\/v\d+$/.test(trimmedBaseUrl) ? trimmedBaseUrl : `${trimmedBaseUrl}/v1`;
+
+  const response = await fetch(`${apiBaseUrl}/events/attendees/export-bulk`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      eventIds,
+      status: filters.status,
+      checkIn: filters.checkIn,
+      q: filters.query.trim() || undefined,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({ message: response.statusText }));
+    throw new Error(errorBody?.message ?? 'Unable to export attendees workbook');
+  }
+
+  return response.blob();
+}

@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   CalendarClock,
   CalendarRange,
+  CheckSquare,
   CircleDot,
   Eye,
   FilePenLine,
@@ -24,6 +25,7 @@ import {
 } from '@/components/ui/select';
 import { useOrganizerEvents, type OrganizerEventsView } from '@/hooks/use-organizer-events';
 import { toast } from '@/hooks/use-toast';
+import { downloadBulkEventAttendeesXlsx } from '@/lib/api/event-checkin';
 import { publishEvent } from '@/lib/api/events';
 import { toPublicMediaUrl } from '@/lib/media-url';
 import type { EventEntity, EventStatus } from '@/types/event';
@@ -85,6 +87,8 @@ export function OrganizerEventsPanel() {
   const [view, setView] = useState<OrganizerEventsView>('all');
   const [status, setStatus] = useState<StatusFilter>('all');
   const [search, setSearch] = useState('');
+  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
+  const [isBulkExporting, setIsBulkExporting] = useState(false);
   const [nowDate] = useState(() => new Date());
 
   const eventsQuery = useOrganizerEvents(session?.accessToken, {
@@ -127,6 +131,89 @@ export function OrganizerEventsPanel() {
   }, [eventsQuery.data?.data, nowDate]);
 
   const filteredEvents = eventsQuery.data?.filtered ?? [];
+  const allFilteredSelected =
+    filteredEvents.length > 0 &&
+    filteredEvents.every((event) => selectedEventIds.includes(event._id));
+
+  const toggleEventSelection = (eventId: string) => {
+    setSelectedEventIds((current) =>
+      current.includes(eventId) ? current.filter((id) => id !== eventId) : [...current, eventId]
+    );
+  };
+
+  const toggleSelectAllFiltered = () => {
+    if (allFilteredSelected) {
+      setSelectedEventIds((current) =>
+        current.filter((id) => !filteredEvents.some((event) => event._id === id))
+      );
+      return;
+    }
+
+    const idsToAdd = filteredEvents.map((event) => event._id);
+    setSelectedEventIds((current) => Array.from(new Set([...current, ...idsToAdd])));
+  };
+
+  const handleExportSelectedAttendeesWorkbook = async () => {
+    if (!session?.accessToken) {
+      toast({
+        title: 'Session expired',
+        description: 'Please sign in again to export attendees.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (selectedEventIds.length === 0) {
+      toast({
+        title: 'No events selected',
+        description: 'Select at least one event before exporting.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setIsBulkExporting(true);
+
+      const selectedEvents = filteredEvents.filter((event) => selectedEventIds.includes(event._id));
+
+      if (selectedEvents.length === 0) {
+        throw new Error('Selected events are not visible with current filters.');
+      }
+
+      const blob = await downloadBulkEventAttendeesXlsx(
+        selectedEvents.map((event) => event._id),
+        session.accessToken,
+        {
+          status: 'all',
+          checkIn: 'all',
+          query: '',
+        }
+      );
+
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = downloadUrl;
+      anchor.download = `event-attendees-bulk-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast({
+        title: 'Export complete',
+        description: `${selectedEvents.length} event sheet(s) exported in one workbook.`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Bulk export failed',
+        description: error instanceof Error ? error.message : 'Unable to export selected events.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsBulkExporting(false);
+    }
+  };
 
   const clearFilters = () => {
     setView('all');
@@ -230,6 +317,33 @@ export function OrganizerEventsPanel() {
           </Button>
         </div>
 
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-9 border-border bg-background/80 text-foreground hover:border-ring/35 hover:bg-muted"
+              onClick={toggleSelectAllFiltered}
+              disabled={filteredEvents.length === 0}
+            >
+              <CheckSquare className="mr-1.5 h-4 w-4" />
+              {allFilteredSelected ? 'Unselect visible' : 'Select visible'}
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              {selectedEventIds.length} selected
+            </span>
+          </div>
+
+          <Button
+            type="button"
+            className="h-9"
+            onClick={() => void handleExportSelectedAttendeesWorkbook()}
+            disabled={selectedEventIds.length === 0 || isBulkExporting}
+          >
+            {isBulkExporting ? 'Exporting...' : 'Export selected Excel'}
+          </Button>
+        </div>
+
         <div className="mt-5 space-y-3">
           {eventsQuery.isLoading ? (
             <div className="rounded-xl border border-border bg-muted/35 p-5 text-sm text-muted-foreground">
@@ -295,11 +409,22 @@ export function OrganizerEventsPanel() {
                       <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/10 to-transparent" />
 
                       <div className="absolute left-3 top-3">
-                        <span
-                          className={`rounded-full border px-2.5 py-1 text-xs font-medium backdrop-blur ${getStatusChipClass(event.status)}`}
-                        >
-                          {event.status}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <label className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/45 px-2 py-1 text-xs text-white/95 backdrop-blur">
+                            <input
+                              type="checkbox"
+                              checked={selectedEventIds.includes(event._id)}
+                              onChange={() => toggleEventSelection(event._id)}
+                              className="h-3.5 w-3.5 accent-primary"
+                            />
+                            Select
+                          </label>
+                          <span
+                            className={`rounded-full border px-2.5 py-1 text-xs font-medium backdrop-blur ${getStatusChipClass(event.status)}`}
+                          >
+                            {event.status}
+                          </span>
+                        </div>
                       </div>
 
                       <div className="absolute right-3 top-3 text-[11px]">

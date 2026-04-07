@@ -12,6 +12,14 @@ export type AdminAuditAction =
 
 export type ComplianceCaseSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type ComplianceCaseStatus = 'open' | 'in_review' | 'actioned' | 'resolved';
+export type AppealRequestStatus = 'submitted' | 'in_review' | 'resolved' | 'rejected';
+export type AppealIssueType =
+  | 'account_suspension'
+  | 'policy_warning'
+  | 'payment_restriction'
+  | 'content_violation'
+  | 'other';
+export type AppealRequestSource = 'public-website' | 'authenticated-website';
 export type ComplianceCaseCategory =
   | 'account_abuse'
   | 'content_policy'
@@ -229,6 +237,40 @@ export interface ComplianceCaseResponse {
   success: boolean;
   message: string;
   data: ComplianceCase;
+}
+
+export interface AppealRequestItem {
+  _id: string;
+  referenceCode: string;
+  fullName: string;
+  workEmail: string;
+  company: string;
+  accountEmail: string;
+  issueType: AppealIssueType;
+  timeline: string;
+  whatHappened: string;
+  correctiveActions: string;
+  evidenceLinks: string[];
+  consent: boolean;
+  source: AppealRequestSource;
+  status: AppealRequestStatus;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ListAppealRequestsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    data: AppealRequestItem[];
+    pagination: PaginationPayload;
+  };
+}
+
+export interface AppealRequestResponse {
+  success: boolean;
+  message: string;
+  data: AppealRequestItem;
 }
 
 export interface AdminEmailCampaign {

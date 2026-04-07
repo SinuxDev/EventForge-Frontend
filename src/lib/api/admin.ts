@@ -1,5 +1,10 @@
 import { apiClient } from '@/lib/api-client';
 import type {
+  AppealIssueType,
+  AppealRequestResponse,
+  AppealRequestSource,
+  AppealRequestStatus,
+  ListAppealRequestsResponse,
   AdminEmailAudienceMode,
   AdminEmailAudienceStatus,
   AdminEmailTemplateKey,
@@ -53,6 +58,15 @@ interface ListAdminEventsOptions {
   startDateFrom?: string;
   startDateTo?: string;
   sort?: 'start_asc' | 'start_desc' | 'created_desc';
+}
+
+interface ListAppealRequestsOptions {
+  page: number;
+  limit: number;
+  q?: string;
+  status?: AppealRequestStatus;
+  issueType?: AppealIssueType;
+  source?: AppealRequestSource;
 }
 
 export async function listAdminUsers(options: ListAdminUsersOptions, headers: AuthHeader) {
@@ -215,6 +229,45 @@ export async function updateComplianceCaseStatus(
       headers,
     }
   );
+}
+
+export async function listAdminAppealRequests(
+  options: ListAppealRequestsOptions,
+  headers: AuthHeader
+) {
+  const query = new URLSearchParams();
+  query.set('page', String(options.page));
+  query.set('limit', String(options.limit));
+
+  if (options.q?.trim()) {
+    query.set('q', options.q.trim());
+  }
+
+  if (options.status) {
+    query.set('status', options.status);
+  }
+
+  if (options.issueType) {
+    query.set('issueType', options.issueType);
+  }
+
+  if (options.source) {
+    query.set('source', options.source);
+  }
+
+  return apiClient.get<ListAppealRequestsResponse>(`/appeals/admin?${query.toString()}`, {
+    headers,
+  });
+}
+
+export async function updateAdminAppealRequestStatus(
+  id: string,
+  payload: { status: AppealRequestStatus },
+  headers: AuthHeader
+) {
+  return apiClient.patch<AppealRequestResponse>(`/appeals/admin/${id}/status`, payload, {
+    headers,
+  });
 }
 
 export async function sendAdminEmailCampaign(

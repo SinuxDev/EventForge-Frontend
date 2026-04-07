@@ -1,4 +1,5 @@
 import {
+  AlertOctagon,
   CalendarRange,
   Compass,
   History,
@@ -54,6 +55,7 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
       { href: '/dashboard/admin/users', label: 'User governance', icon: Users },
       { href: '/dashboard/admin/events', label: 'Events', icon: CalendarRange },
       { href: '/dashboard/admin/compliance', label: 'Compliance', icon: ShieldAlert },
+      { href: '/dashboard/admin/appeals', label: 'Appeals', icon: AlertOctagon },
       { href: '/dashboard/admin/demo-requests', label: 'Demo requests', icon: Megaphone },
       { href: '/dashboard/admin/email', label: 'Email center', icon: Mail },
       { href: '/dashboard/admin/email/history', label: 'Campaign history', icon: History },

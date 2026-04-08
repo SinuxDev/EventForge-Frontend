@@ -7,7 +7,13 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { useEffect, useRef, useState } from 'react';
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { OrganizerEventSubnav } from '@/components/events/organizer-event-subnav';
-import { useCheckInByQr, useEventAttendance, useUndoCheckIn } from '@/hooks/use-event-checkin';
+import {
+  useCheckInByQr,
+  useCheckInByTicket,
+  useEventAttendance,
+  useEventAttendees,
+  useUndoCheckIn,
+} from '@/hooks/use-event-checkin';
 import { toast } from '@/hooks/use-toast';
 import type { CheckInResponse } from '@/lib/api/event-checkin';
 
@@ -18,6 +24,7 @@ export default function OrganizerCheckInPage() {
   const { data: session } = useSession();
   const attendanceQuery = useEventAttendance(id, session?.accessToken);
   const checkInMutation = useCheckInByQr(id, session?.accessToken);
+  const checkInByTicketMutation = useCheckInByTicket(id, session?.accessToken);
   const undoCheckInMutation = useUndoCheckIn(id, session?.accessToken);
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
@@ -25,7 +32,17 @@ export default function OrganizerCheckInPage() {
 
   const [isScannerRunning, setIsScannerRunning] = useState(false);
   const [manualQrCode, setManualQrCode] = useState('');
+  const [lookupQuery, setLookupQuery] = useState('');
+  const [debouncedLookupQuery, setDebouncedLookupQuery] = useState('');
   const [lastScanResult, setLastScanResult] = useState<CheckInResponse | null>(null);
+
+  const lookupAttendeesQuery = useEventAttendees(id, session?.accessToken, {
+    status: 'registered',
+    checkIn: 'all',
+    query: debouncedLookupQuery,
+    page: 1,
+    limit: 8,
+  });
 
   const stopScanner = async () => {
     if (!scannerRef.current) {
@@ -121,6 +138,14 @@ export default function OrganizerCheckInPage() {
     };
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedLookupQuery(lookupQuery.trim());
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [lookupQuery]);
+
   const handleManualCheckIn = async () => {
     const normalized = manualQrCode.trim();
     if (!normalized) {
@@ -152,6 +177,48 @@ export default function OrganizerCheckInPage() {
       toast({
         title: 'Unable to undo check-in',
         description: error instanceof Error ? error.message : 'Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleLookupCheckIn = async (params: {
+    attendeeName: string;
+    attendeeEmail: string;
+    ticketId: string;
+    isCheckedIn: boolean;
+  }) => {
+    if (params.isCheckedIn) {
+      toast({
+        title: 'Already checked in',
+        description: `${params.attendeeName} is already checked in.`,
+      });
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Check in ${params.attendeeName} (${params.attendeeEmail}) now?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const result = await checkInByTicketMutation.mutateAsync({
+        ticketId: params.ticketId,
+        source: 'lookup',
+      });
+
+      setLastScanResult(result);
+      toast({
+        title: result.alreadyCheckedIn ? 'Already checked in' : 'Check-in successful',
+        description: `${result.attendeeName} is now marked present.`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Check-in failed',
+        description: error instanceof Error ? error.message : 'Unable to check in attendee',
         variant: 'destructive',
       });
     }
@@ -267,9 +334,90 @@ export default function OrganizerCheckInPage() {
             </article>
 
             <article className="rounded-2xl border border-border bg-card/80 p-5">
-              <h3 className="text-base font-semibold text-foreground">Latest scan result</h3>
+              <h3 className="text-base font-semibold text-foreground">
+                Check in by attendee name/email
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Search registered attendees and check them in without scanning.
+              </p>
+              <div className="mt-4 space-y-3">
+                <input
+                  value={lookupQuery}
+                  onChange={(event) => setLookupQuery(event.target.value)}
+                  placeholder="Search attendee name or email"
+                  className="h-10 w-full rounded-lg border border-input bg-background/85 px-3 text-sm text-foreground outline-none transition focus:border-ring"
+                />
+
+                {debouncedLookupQuery.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    Start typing a name or email to find attendees.
+                  </p>
+                ) : lookupAttendeesQuery.isFetching ? (
+                  <p className="text-xs text-muted-foreground">Searching attendees...</p>
+                ) : (lookupAttendeesQuery.data?.items ?? []).length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No matching attendees found.</p>
+                ) : (
+                  <div className="max-h-48 space-y-2 overflow-y-auto pr-1">
+                    {(lookupAttendeesQuery.data?.items ?? []).map((item) => {
+                      const ticket = item.ticket;
+
+                      return (
+                        <div
+                          key={item.rsvpId}
+                          className="rounded-lg border border-border bg-background/70 p-2.5"
+                        >
+                          <p className="text-sm font-medium text-foreground">
+                            {item.attendee.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">{item.attendee.email}</p>
+                          {!ticket ? (
+                            <p className="mt-1 text-xs text-amber-600">
+                              Ticket not generated yet for this RSVP.
+                            </p>
+                          ) : (
+                            <div className="mt-2 flex items-center justify-between gap-2">
+                              <span
+                                className={
+                                  ticket.isCheckedIn
+                                    ? 'text-xs text-amber-600'
+                                    : 'text-xs text-emerald-600'
+                                }
+                              >
+                                {ticket.isCheckedIn ? 'Already checked in' : 'Ready for check-in'}
+                              </span>
+                              <button
+                                type="button"
+                                disabled={
+                                  ticket.isCheckedIn ||
+                                  checkInByTicketMutation.isPending ||
+                                  lookupAttendeesQuery.isFetching
+                                }
+                                onClick={() =>
+                                  void handleLookupCheckIn({
+                                    attendeeName: item.attendee.name,
+                                    attendeeEmail: item.attendee.email,
+                                    ticketId: ticket.id,
+                                    isCheckedIn: ticket.isCheckedIn,
+                                  })
+                                }
+                                className="inline-flex h-8 items-center rounded-lg border border-primary/35 bg-primary px-3 text-xs font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-70"
+                              >
+                                Check in
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </article>
+
+            <article className="rounded-2xl border border-border bg-card/80 p-5">
+              <h3 className="text-base font-semibold text-foreground">Latest check-in result</h3>
               {!lastScanResult ? (
-                <p className="mt-2 text-sm text-muted-foreground">No scans yet.</p>
+                <p className="mt-2 text-sm text-muted-foreground">No check-ins yet.</p>
               ) : (
                 <div className="mt-3 space-y-2 text-sm">
                   <p className="text-foreground">

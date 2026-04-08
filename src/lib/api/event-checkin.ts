@@ -66,7 +66,7 @@ export interface CheckInResponse {
   attendeeEmail: string;
   alreadyCheckedIn: boolean;
   checkedInAt: string;
-  source: 'scanner' | 'manual';
+  source: 'scanner' | 'manual' | 'lookup';
 }
 
 interface UndoCheckInResponse {
@@ -101,6 +101,28 @@ export async function checkInByQr(
     `/events/${eventId}/check-in`,
     {
       qrCode,
+      source,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  return response.data;
+}
+
+export async function checkInByTicket(
+  eventId: string,
+  ticketId: string,
+  accessToken: string,
+  source: 'lookup'
+): Promise<CheckInResponse> {
+  const response = await apiClient.post<ApiEnvelope<CheckInResponse>>(
+    `/events/${eventId}/check-in/ticket`,
+    {
+      ticketId,
       source,
     },
     {

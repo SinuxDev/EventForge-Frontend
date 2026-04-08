@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  checkInByTicket,
   checkInByQr,
   getEventAttendance,
   getEventAttendees,
@@ -42,6 +43,23 @@ export function useCheckInByQr(eventId: string, accessToken?: string) {
       }
 
       return checkInByQr(eventId, params.qrCode, accessToken, params.source);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: eventCheckInKeys.all });
+    },
+  });
+}
+
+export function useCheckInByTicket(eventId: string, accessToken?: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: { ticketId: string; source: 'lookup' }) => {
+      if (!accessToken) {
+        throw new Error('You must be signed in to check in attendees');
+      }
+
+      return checkInByTicket(eventId, params.ticketId, accessToken, params.source);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: eventCheckInKeys.all });

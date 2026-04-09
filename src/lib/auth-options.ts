@@ -36,6 +36,8 @@ interface AuthUser {
 interface SessionUpdatePayload {
   user?: {
     role?: 'attendee' | 'organizer' | 'admin';
+    name?: string;
+    image?: string | null;
   };
   accessToken?: string;
 }
@@ -173,6 +175,14 @@ export const authOptions: NextAuthOptions = {
           token.role = payload.user.role;
         }
 
+        if (typeof payload.user?.name === 'string') {
+          token.name = payload.user.name;
+        }
+
+        if (payload.user?.image !== undefined) {
+          token.picture = payload.user.image ?? undefined;
+        }
+
         if (payload.accessToken) {
           token.accessToken = payload.accessToken;
         }
@@ -185,6 +195,15 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.sub || '';
         session.user.role = (token.role as 'attendee' | 'organizer' | 'admin') || 'attendee';
+        if (typeof token.name === 'string') {
+          session.user.name = token.name;
+        }
+        if (typeof token.email === 'string') {
+          session.user.email = token.email;
+        }
+        if (typeof token.picture === 'string') {
+          session.user.image = token.picture;
+        }
       }
 
       session.accessToken = (token.accessToken as string | undefined) ?? undefined;

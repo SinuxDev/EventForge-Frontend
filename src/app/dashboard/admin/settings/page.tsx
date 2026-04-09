@@ -3,10 +3,10 @@
 import { DashboardShell } from '@/components/dashboard/dashboard-shell';
 import { UserSettingsPanel } from '@/components/settings/user-settings-panel';
 
-export default function OrganizerSettingsPage() {
+export default function AdminSettingsPage() {
   return (
-    <DashboardShell requiredRole="organizer">
-      <UserSettingsPanel role="organizer" />
+    <DashboardShell requiredRole="admin">
+      <UserSettingsPanel role="admin" />
     </DashboardShell>
   );
 }

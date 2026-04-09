@@ -1,6 +1,7 @@
 import {
   AlertOctagon,
   CalendarRange,
+  Cog,
   Compass,
   History,
   LayoutDashboard,
@@ -34,6 +35,7 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
     items: [
       { href: '/dashboard/attendee', label: 'Overview', icon: LayoutDashboard },
       { href: '/dashboard/attendee/events', label: 'My events', icon: Rows2 },
+      { href: '/dashboard/attendee/settings', label: 'Settings', icon: Cog },
       { href: '/events', label: 'Discover events', icon: Compass },
       { href: '/book-demo', label: 'Book demo', icon: LifeBuoy },
     ],
@@ -60,7 +62,7 @@ const ROLE_DASHBOARD_NAV: Record<AppUserRole, DashboardNavConfig> = {
       { href: '/dashboard/admin/email', label: 'Email center', icon: Mail },
       { href: '/dashboard/admin/email/history', label: 'Campaign history', icon: History },
       { href: '/dashboard/admin/audit', label: 'Audit logs', icon: ScrollText },
-      { href: '/book-demo', label: 'Support', icon: LifeBuoy },
+      { href: '/dashboard/admin/settings', label: 'Settings', icon: Cog },
     ],
   },
 };

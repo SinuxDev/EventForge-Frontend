@@ -74,9 +74,9 @@ export default function TicketDetailPage() {
                 </div>
               )}
 
-              <p className="mt-4 text-xs text-muted-foreground">Ticket code</p>
+              <p className="mt-4 text-xs text-muted-foreground">Manual check-in code</p>
               <p className="mt-1 break-all rounded-md border border-border bg-muted/40 px-3 py-2 font-mono text-xs text-foreground">
-                {ticketQuery.data.qrCode}
+                {ticketQuery.data.shortCode}
               </p>
             </div>
 

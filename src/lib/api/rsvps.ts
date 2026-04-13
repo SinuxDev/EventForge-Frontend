@@ -36,6 +36,7 @@ export interface RsvpTicketEntity {
   eventTimezone: string;
   status: RsvpStatus;
   ticketId: string;
+  shortCode: string;
   qrCode: string;
   qrCodeImage: string | null;
 }

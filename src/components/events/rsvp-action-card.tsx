@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 import { submitRsvp } from '@/lib/api/events';
+import { runWithIdempotencyRetry } from '@/lib/idempotency';
 
 interface RsvpActionCardProps {
   eventId: string;
@@ -25,7 +26,9 @@ export function RsvpActionCard({ eventId, eventTitle }: RsvpActionCardProps) {
   const isAuthenticated = status === 'authenticated';
 
   const handleRsvp = async () => {
-    if (!isAuthenticated || !session?.accessToken) {
+    const accessToken = session?.accessToken;
+
+    if (!isAuthenticated || !accessToken) {
       toast({
         title: 'Sign in required',
         description: 'Please sign in to RSVP for this event.',
@@ -37,7 +40,9 @@ export function RsvpActionCard({ eventId, eventTitle }: RsvpActionCardProps) {
 
     try {
       setIsSubmitting(true);
-      const result = await submitRsvp(eventId, {}, session.accessToken);
+      const result = await runWithIdempotencyRetry('submit-rsvp', (idempotencyKey) =>
+        submitRsvp(eventId, {}, accessToken, idempotencyKey)
+      );
       setRsvpResult({
         status: result.status,
         waitlistPosition: result.waitlistPosition,

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import type { Rsvp, Ticket, ApiResponse } from '@/types';
 import type { RsvpInput } from '@/lib/schemas';
+import { runWithIdempotencyRetry } from '@/lib/idempotency';
 
 export const rsvpKeys = {
   all: ['rsvps'] as const,
@@ -23,7 +24,13 @@ export function useSubmitRsvp(eventId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: RsvpInput) =>
-      apiClient.post<ApiResponse<Rsvp>>(`/events/${eventId}/rsvp`, data),
+      runWithIdempotencyRetry('submit-rsvp', (idempotencyKey) =>
+        apiClient.post<ApiResponse<Rsvp>>(`/events/${eventId}/rsvp`, data, {
+          headers: {
+            'Idempotency-Key': idempotencyKey,
+          },
+        })
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: rsvpKeys.my() });
     },

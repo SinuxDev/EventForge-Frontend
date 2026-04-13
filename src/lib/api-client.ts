@@ -3,6 +3,17 @@
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api';
 
+export class ApiClientError extends Error {
+  public readonly status: number;
+  public readonly data: unknown;
+
+  constructor(message: string, status: number, data: unknown) {
+    super(message);
+    this.status = status;
+    this.data = data;
+  }
+}
+
 type RequestOptions = Omit<RequestInit, 'body'> & {
   body?: unknown;
 };
@@ -23,7 +34,12 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(errorBody?.message ?? `Request failed with status ${res.status}`);
+    throw new ApiClientError(
+      (errorBody as { message?: string } | null)?.message ??
+        `Request failed with status ${res.status}`,
+      res.status,
+      errorBody
+    );
   }
 
   return res.json() as Promise<T>;

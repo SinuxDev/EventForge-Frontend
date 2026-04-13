@@ -184,7 +184,8 @@ export async function getPublicEventById(eventId: string): Promise<EventEntity> 
 export async function submitRsvp(
   eventId: string,
   payload: SubmitRsvpPayload,
-  accessToken: string
+  accessToken: string,
+  idempotencyKey?: string
 ): Promise<SubmitRsvpResult> {
   const response = await apiClient.post<ApiEnvelope<SubmitRsvpResult>>(
     `/events/${eventId}/rsvp`,
@@ -192,6 +193,7 @@ export async function submitRsvp(
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
       },
     }
   );

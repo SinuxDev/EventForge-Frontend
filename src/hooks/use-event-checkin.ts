@@ -7,6 +7,7 @@ import {
   undoEventCheckIn,
   type EventAttendeesQueryParams,
 } from '@/lib/api/event-checkin';
+import { runWithIdempotencyRetry } from '@/lib/idempotency';
 
 export const eventCheckInKeys = {
   all: ['event-checkin'] as const,
@@ -42,7 +43,9 @@ export function useCheckInByQr(eventId: string, accessToken?: string) {
         throw new Error('You must be signed in to check in attendees');
       }
 
-      return checkInByQr(eventId, params.qrCode, accessToken, params.source);
+      return runWithIdempotencyRetry('checkin-qr', (idempotencyKey) =>
+        checkInByQr(eventId, params.qrCode, accessToken, params.source, idempotencyKey)
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: eventCheckInKeys.all });
@@ -59,7 +62,9 @@ export function useCheckInByTicket(eventId: string, accessToken?: string) {
         throw new Error('You must be signed in to check in attendees');
       }
 
-      return checkInByTicket(eventId, params.ticketId, accessToken, params.source);
+      return runWithIdempotencyRetry('checkin-ticket', (idempotencyKey) =>
+        checkInByTicket(eventId, params.ticketId, accessToken, params.source, idempotencyKey)
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: eventCheckInKeys.all });
@@ -76,7 +81,9 @@ export function useUndoCheckIn(eventId: string, accessToken?: string) {
         throw new Error('You must be signed in to undo check-in');
       }
 
-      return undoEventCheckIn(eventId, ticketId, accessToken);
+      return runWithIdempotencyRetry('checkin-undo', (idempotencyKey) =>
+        undoEventCheckIn(eventId, ticketId, accessToken, idempotencyKey)
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: eventCheckInKeys.all });

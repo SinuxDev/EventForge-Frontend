@@ -95,7 +95,8 @@ export async function checkInByQr(
   eventId: string,
   qrCode: string,
   accessToken: string,
-  source: 'scanner' | 'manual'
+  source: 'scanner' | 'manual',
+  idempotencyKey?: string
 ): Promise<CheckInResponse> {
   const response = await apiClient.post<ApiEnvelope<CheckInResponse>>(
     `/events/${eventId}/check-in`,
@@ -106,6 +107,7 @@ export async function checkInByQr(
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
       },
     }
   );
@@ -117,7 +119,8 @@ export async function checkInByTicket(
   eventId: string,
   ticketId: string,
   accessToken: string,
-  source: 'lookup'
+  source: 'lookup',
+  idempotencyKey?: string
 ): Promise<CheckInResponse> {
   const response = await apiClient.post<ApiEnvelope<CheckInResponse>>(
     `/events/${eventId}/check-in/ticket`,
@@ -128,6 +131,7 @@ export async function checkInByTicket(
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
       },
     }
   );
@@ -138,7 +142,8 @@ export async function checkInByTicket(
 export async function undoEventCheckIn(
   eventId: string,
   ticketId: string,
-  accessToken: string
+  accessToken: string,
+  idempotencyKey?: string
 ): Promise<UndoCheckInResponse> {
   const response = await apiClient.post<ApiEnvelope<UndoCheckInResponse>>(
     `/events/${eventId}/check-in/undo`,
@@ -148,6 +153,7 @@ export async function undoEventCheckIn(
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
       },
     }
   );

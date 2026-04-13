@@ -2,12 +2,14 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Github, X } from 'lucide-react';
-import { signIn } from 'next-auth/react';
+import { getSession, signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { apiClient } from '@/lib/api-client';
+import { getPostLoginRoute } from '@/lib/auth-redirect';
 import {
   signInSchema,
   signUpSchema,
@@ -43,6 +45,7 @@ function GoogleIcon() {
 }
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+  const router = useRouter();
   const [mode, setMode] = useState<AuthMode>('signin');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSocialLoading, setIsSocialLoading] = useState(false);
@@ -81,7 +84,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       email: values.email,
       password: values.password,
       redirect: false,
-      callbackUrl: '/',
+      callbackUrl: '/auth/post-login',
     });
 
     if (!result?.ok) {
@@ -92,7 +95,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     toast({ title: 'Signed in successfully' });
     onClose();
-    window.location.reload();
+    const session = await getSession();
+    const role = session?.user?.role ?? 'attendee';
+    router.replace(getPostLoginRoute(role));
   };
 
   const handleSignUp = async (values: SignUpInput) => {
@@ -110,7 +115,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         email: values.email,
         password: values.password,
         redirect: false,
-        callbackUrl: '/',
+        callbackUrl: '/auth/post-login',
       });
 
       if (!result?.ok) {
@@ -122,7 +127,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
       toast({ title: 'Account created successfully' });
       onClose();
-      window.location.reload();
+      const session = await getSession();
+      const role = session?.user?.role ?? 'attendee';
+      router.replace(getPostLoginRoute(role));
     } catch (error) {
       if (error instanceof Error && error.message.toLowerCase().includes('email already')) {
         setErrorMessage('Email Already Registered');
@@ -140,7 +147,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setIsSocialLoading(true);
     setErrorMessage(null);
     try {
-      await signIn(provider, { callbackUrl: '/' });
+      await signIn(provider, { callbackUrl: '/auth/post-login' });
     } finally {
       setIsSocialLoading(false);
     }

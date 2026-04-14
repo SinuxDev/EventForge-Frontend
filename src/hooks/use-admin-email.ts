@@ -70,6 +70,7 @@ export function useSendAdminEmailCampaign(headers: AuthHeaders | null) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['admin-email-campaigns'] }),
         queryClient.invalidateQueries({ queryKey: ['admin-audit-logs'] }),
+        queryClient.invalidateQueries({ queryKey: ['admin-overview-charts'] }),
       ]);
     },
   });

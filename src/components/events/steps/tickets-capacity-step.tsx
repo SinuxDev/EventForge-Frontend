@@ -3,6 +3,7 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { useFormContext, type UseFieldArrayReturn } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
+import { DateTimeField } from '@/components/ui/date-time-field';
 import {
   Select,
   SelectContent,
@@ -86,12 +87,16 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
 
         <label className="block space-y-2">
           <span className="text-sm text-muted-foreground">Registration opens</span>
-          <input
-            type="datetime-local"
-            {...form.register('registrationOpenAt', {
-              onChange: validateRegistrationDates,
-            })}
-            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none focus:border-ring"
+          <DateTimeField
+            value={form.watch('registrationOpenAt') ?? ''}
+            onChange={(value) => {
+              form.setValue('registrationOpenAt', value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              validateRegistrationDates();
+            }}
+            placeholder="Choose opening date and time"
             max={eventStartDateTime || undefined}
           />
           <p className="text-xs text-destructive">
@@ -101,12 +106,16 @@ export function TicketsCapacityStep({ ticketsFieldArray }: TicketsCapacityStepPr
 
         <label className="block space-y-2">
           <span className="text-sm text-muted-foreground">Registration closes</span>
-          <input
-            type="datetime-local"
-            {...form.register('registrationCloseAt', {
-              onChange: validateRegistrationDates,
-            })}
-            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none focus:border-ring"
+          <DateTimeField
+            value={form.watch('registrationCloseAt') ?? ''}
+            onChange={(value) => {
+              form.setValue('registrationCloseAt', value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              validateRegistrationDates();
+            }}
+            placeholder="Choose closing date and time"
             max={eventStartDateTime || undefined}
           />
           <p className="text-xs text-destructive">

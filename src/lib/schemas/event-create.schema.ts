@@ -145,6 +145,36 @@ export const eventCreateSchema = z
     attendeeQuestions: z.array(questionSchema).max(20),
   })
   .superRefine((value, ctx) => {
+    const now = new Date();
+    const tomorrowStart = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+      0,
+      0,
+      0,
+      0
+    );
+
+    const startDate = value.startDateTime ? new Date(value.startDateTime) : null;
+    const endDate = value.endDateTime ? new Date(value.endDateTime) : null;
+
+    if (startDate && !Number.isNaN(startDate.getTime()) && startDate < tomorrowStart) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['startDateTime'],
+        message: 'Start date/time must be from tomorrow onward',
+      });
+    }
+
+    if (endDate && !Number.isNaN(endDate.getTime()) && endDate < tomorrowStart) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['endDateTime'],
+        message: 'End date/time must be from tomorrow onward',
+      });
+    }
+
     if (value.endDateTime <= value.startDateTime) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

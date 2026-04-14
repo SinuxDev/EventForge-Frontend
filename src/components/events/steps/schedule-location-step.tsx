@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { DateTimeField } from '@/components/ui/date-time-field';
 import { CURATED_TIMEZONE_OPTIONS } from '@/components/events/constants';
 import type { EventCreateFormValues } from '@/lib/schemas/event-create.schema';
 import { useFormContext } from 'react-hook-form';
@@ -16,6 +17,18 @@ export function ScheduleLocationStep() {
   const form = useFormContext<EventCreateFormValues>();
   const attendanceMode = form.watch('attendanceMode');
   const timezone = form.watch('timezone');
+
+  const minimumEventStartDateTime = useMemo(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const year = tomorrow.getFullYear();
+    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const day = String(tomorrow.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T00:00`;
+  }, []);
 
   const timezoneOptions = useMemo(() => {
     if (
@@ -48,28 +61,34 @@ export function ScheduleLocationStep() {
       <div className="grid gap-4 md:grid-cols-3">
         <label className="block space-y-2">
           <span className="text-sm text-muted-foreground">Start date/time</span>
-          <input
-            type="datetime-local"
-            {...form.register('startDateTime', {
-              onChange: () => {
-                void form.trigger(['startDateTime', 'endDateTime']);
-              },
-            })}
-            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none transition focus:border-ring"
+          <DateTimeField
+            value={form.watch('startDateTime')}
+            onChange={(value) => {
+              form.setValue('startDateTime', value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              void form.trigger(['startDateTime', 'endDateTime']);
+            }}
+            placeholder="Choose start date and time"
+            min={minimumEventStartDateTime}
           />
           <p className="text-xs text-destructive">{form.formState.errors.startDateTime?.message}</p>
         </label>
 
         <label className="block space-y-2">
           <span className="text-sm text-muted-foreground">End date/time</span>
-          <input
-            type="datetime-local"
-            {...form.register('endDateTime', {
-              onChange: () => {
-                void form.trigger(['startDateTime', 'endDateTime']);
-              },
-            })}
-            className="h-11 w-full rounded-xl border border-input bg-background/85 px-3.5 text-sm text-foreground outline-none transition focus:border-ring"
+          <DateTimeField
+            value={form.watch('endDateTime')}
+            onChange={(value) => {
+              form.setValue('endDateTime', value, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+              void form.trigger(['startDateTime', 'endDateTime']);
+            }}
+            placeholder="Choose end date and time"
+            min={minimumEventStartDateTime}
           />
           <p className="text-xs text-destructive">{form.formState.errors.endDateTime?.message}</p>
         </label>

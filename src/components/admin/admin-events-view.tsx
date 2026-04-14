@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { AdminEventsTable } from '@/components/admin/admin-events-table';
+import { DateField } from '@/components/ui/date-time-field';
 import {
   Select,
   SelectContent,
@@ -171,19 +172,13 @@ export function AdminEventsView() {
             </SelectContent>
           </Select>
 
-          <input
+          <DateField
             value={startDateFrom}
-            onChange={(event) => setStartDateFrom(event.target.value)}
-            type="date"
-            className="h-11 rounded-xl border border-input bg-background px-3.5 text-sm text-foreground outline-none transition focus:border-ring"
+            onChange={setStartDateFrom}
+            placeholder="Start date from"
           />
 
-          <input
-            value={startDateTo}
-            onChange={(event) => setStartDateTo(event.target.value)}
-            type="date"
-            className="h-11 rounded-xl border border-input bg-background px-3.5 text-sm text-foreground outline-none transition focus:border-ring"
-          />
+          <DateField value={startDateTo} onChange={setStartDateTo} placeholder="Start date to" />
         </div>
 
         <div className="mt-3 flex flex-wrap gap-2">

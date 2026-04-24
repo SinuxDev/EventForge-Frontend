@@ -31,6 +31,22 @@ function getRoleLabel(role: AppUserRole): string {
   return 'Attendee';
 }
 
+function getInitials(value: string): string {
+  const normalized = value.trim();
+
+  if (!normalized) {
+    return 'U';
+  }
+
+  const words = normalized.split(/\s+/).filter(Boolean);
+
+  if (words.length === 1) {
+    return words[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${words[0][0] ?? ''}${words[1][0] ?? ''}`.toUpperCase();
+}
+
 export function DashboardShell({
   requiredRole,
   allowedRoles,
@@ -41,6 +57,7 @@ export function DashboardShell({
   const router = useRouter();
   const pathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [failedAvatarUrl, setFailedAvatarUrl] = useState<string | null>(null);
   const isDesktopSidebarCollapsed = useDashboardShellStore(
     (state) => state.isDesktopSidebarCollapsed
   );
@@ -76,6 +93,23 @@ export function DashboardShell({
 
   const navConfig = useMemo(() => getDashboardNavConfig(effectiveNavRole), [effectiveNavRole]);
   const dashboardLabel = useMemo(() => getRoleLabel(effectiveNavRole), [effectiveNavRole]);
+  const displayName = useMemo(() => {
+    const name = session?.user?.name?.trim();
+    if (name) {
+      return name;
+    }
+
+    return session?.user?.email ?? 'User';
+  }, [session?.user?.email, session?.user?.name]);
+  const secondaryLabel = useMemo(() => {
+    const email = session?.user?.email;
+    if (!email || email === displayName) {
+      return null;
+    }
+
+    return email;
+  }, [displayName, session?.user?.email]);
+  const userInitials = useMemo(() => getInitials(displayName), [displayName]);
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' });
@@ -149,9 +183,26 @@ export function DashboardShell({
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <p className="text-xs text-muted-foreground sm:text-sm">
-              {session.user.name ?? session.user.email}
-            </p>
+            <div className="flex items-center gap-2 rounded-full border border-border bg-card/80 px-2.5 py-1">
+              {session.user.image && failedAvatarUrl !== session.user.image ? (
+                <img
+                  src={session.user.image}
+                  alt={`${displayName} profile photo`}
+                  className="h-8 w-8 rounded-full object-cover"
+                  onError={() => setFailedAvatarUrl(session.user.image ?? null)}
+                />
+              ) : (
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
+                  {userInitials}
+                </div>
+              )}
+              <div className="hidden leading-tight sm:block">
+                <p className="text-sm font-medium text-foreground">{displayName}</p>
+                {secondaryLabel ? (
+                  <p className="text-xs text-muted-foreground">{secondaryLabel}</p>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
       </header>
